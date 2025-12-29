@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 Annual Planning System</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fafafa;
+        }
+        .header {
+            background: #A38679;
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        .header h1 { margin: 0 0 10px 0; }
+        .header p { margin: 5px 0; opacity: 0.95; }
+        .sync-status {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .tab {
+            padding: 12px 24px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            transition: all 0.2s;
+            color: #56493D;
+        }
+        .tab:hover {
+            border-color: #C6A587;
+            background: #fefefe;
+        }
+        .tab.active {
+            background: #A38679;
+            color: white;
+            border-color: #A38679;
+        }
+        .content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            display: none;
+        }
+        .content.active {
+            display: block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th {
+            background: #C6A587;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 500;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        tr:hover { background: #fafafa; }
+        .section {
+            margin: 30px 0;
+        }
+        .section h3 {
+            color: #A38679;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        .metric-card {
+            display: inline-block;
+            background: #A38679;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 10px;
+            min-width: 200px;
+        }
+        .metric-card h4 {
+            margin: 0 0 10px 0;
+            font-size: 13px;
+            opacity: 0.9;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .metric-card .value {
+            font-size: 32px;
+            font-weight: 600;
+            margin: 0;
+        }
+        .note {
+            background: #fef9f5;
+            border-left: 3px solid #C6A587;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .instructions {
+            background: #fef9f5;
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        .instructions h4 {
+            margin-top: 0;
+            color: #A38679;
+            font-weight: 500;
+        }
+        .quarter-card {
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border-left: 3px solid #C6A587;
+        }
+        .week-block {
+            background: #fafafa;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 6px;
+            border-left: 3px solid #C6A587;
+        }
+        .week-block h4 {
+            margin: 0 0 10px 0;
+            color: #A38679;
+            font-weight: 500;
+        }
+        .editable {
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+            min-height: 20px;
+            display: inline-block;
+            min-width: 40px;
+        }
+        .editable:hover {
+            background: #fef9f5;
+            outline: 1px solid #C6A587;
+        }
+        .export-btn {
+            background: #A38679;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            margin: 20px 0;
+            transition: background 0.2s;
+        }
+        .export-btn:hover {
+            background: #56493D;
+        }
+        .add-task-btn {
+            background: #C6A587;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+        .add-task-btn:hover {
+            background: #A38679;
+        }
+        .delete-task-btn {
+            background: #d9534f;
+            color: white;
+            padding: 2px 6px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 10px;
+            margin-left: 8px;
+            transition: background 0.2s;
+        }
+        .delete-task-btn:hover {
+            background: #c9302c;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="sync-status">🟢 Live Sync Active</div>
+        <h1>🚀 2026 Annual Planning & Tracking System</h1>
+        <p><strong>Company:</strong> Makeup Matching App (Preseed Stage)</p>
+        <p><strong>Team:</strong> 5 people | <strong>Capacity:</strong> 25-50 hours/week</p>
+        <p><strong>Mission:</strong> Help WOC find perfect makeup matches + support indie brands</p>
+        <p style="font-size: 12px; opacity: 0.8; margin-top: 10px;">💡 Click any "Actual" value in Metrics Dashboard to edit. Changes sync in real-time!</p>
+    </div>
+
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('annual')">📅 Annual Overview</button>
+        <button class="tab" onclick="switchTab('q1')">Q1 Plan</button>
+        <button class="tab" onclick="switchTab('q2')">Q2 Plan</button>
+        <button class="tab" onclick="switchTab('q3')">Q3 Plan</button>
+        <button class="tab" onclick="switchTab('q4')">Q4 Plan</button>
+        <button class="tab" onclick="switchTab('tasks')">✅ Weekly Tasks</button>
+        <button class="tab" onclick="switchTab('metrics')">📊 Metrics Dashboard</button>
+    </div>
+
+    <div id="annual" class="content active">
+        <div class="instructions">
+            <h4>💡 How to Use This System</h4>
+            <p><strong>Weekly:</strong> Review Weekly Tasks tab every Wednesday<br>
+            <strong>Monthly:</strong> Update Metrics Dashboard with actual numbers<br>
+            <strong>Quarterly:</strong> Review progress and adjust plans</p>
+        </div>
+
+        <div class="section">
+            <h3>🎯 2026 North Star Goals</h3>
+            <div class="metric-card">
+                <h4>Total Users</h4>
+                <p class="value">5,000</p>
+            </div>
+            <div class="metric-card">
+                <h4>Brand Partnerships</h4>
+                <p class="value">3</p>
+            </div>
+            <div class="metric-card">
+                <h4>Monthly Transacting Users</h4>
+                <p class="value">100</p>
+            </div>
+            <div class="metric-card">
+                <h4>Affiliate Revenue</h4>
+                <p class="value">$15K+</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>📈 Quarterly Milestones</h3>
+            <table>
+                <tr>
+                    <th>Quarter</th>
+                    <th>Phase</th>
+                    <th>Primary Goal</th>
+                    <th>Key Deliverables</th>
+                    <th>Success Metrics</th>
+                </tr>
+                <tr>
+                    <td><strong>Q1</strong><br>Jan-Mar</td>
+                    <td>Validation</td>
+                    <td>Validate product-market fit</td>
+                    <td>• App launch<br>• Customer journey mapping<br>• Hire social intern<br>• Dupe detector MVP</td>
+                    <td>• 750 downloads<br>• 60 sample requests<br>• 25 purchases<br>• 4.5+ rating</td>
+                </tr>
+                <tr>
+                    <td><strong>Q2</strong><br>Apr-Jun</td>
+                    <td>Optimization</td>
+                    <td>Scale in-person marketing</td>
+                    <td>• 3-4 campus events<br>• <strong>Ulta Beauty World (Apr 16)</strong><br>• Expand dupe detector<br>• Brand analytics dashboard</td>
+                    <td>• 1,500 downloads<br>• 60 MTU<br>• First brand partner<br>• 4 campus events</td>
+                </tr>
+                <tr>
+                    <td><strong>Q3</strong><br>Jul-Sep</td>
+                    <td>Growth + Fundraise</td>
+                    <td>Scale + RAISE PRESEED</td>
+                    <td>• Follow-up from Q2 event<br>• User reviews<br>• Active fundraising</td>
+                    <td>• 3,500 total users<br>• 2 brand partners<br>• 80 MTU<br>• $150K-$300K raised</td>
+                </tr>
+                <tr>
+                    <td><strong>Q4</strong><br>Oct-Dec</td>
+                    <td>Scale</td>
+                    <td>Prove revenue model</td>
+                    <td>• 3rd brand partnership<br>• Holiday marketing<br>• Deploy funding</td>
+                    <td>• 5,000 total users<br>• 3 brand partners<br>• 100+ MTU<br>• $15K+ revenue</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h3>🎪 In-Person Marketing Strategy</h3>
+            <table>
+                <tr>
+                    <th>Timing</th>
+                    <th>Event Type</th>
+                    <th>Strategy</th>
+                    <th>Expected Impact</th>
+                </tr>
+                <tr>
+                    <td>Q2 (Apr-Jun)</td>
+                    <td>Campus Events + Beauty Event</td>
+                    <td>• Partner with campus ambassador<br>• Booth at student centers<br>• Free shade matching<br>• 3-4 events at HBCUs<br>• <strong>Attend Ulta Beauty World (Apr 16)</strong></td>
+                    <td>150-200 downloads<br>30-40 sample requests<br>20+ brand contacts</td>
+                </tr>
+                <tr>
+                    <td>Q3 (Jul-Sep)</td>
+                    <td>Follow-up & Local Events</td>
+                    <td>• Follow up with Ulta Beauty World contacts<br>• Explore local beauty pop-ups<br>• Summer campus activations</td>
+                    <td>2-3 brand partnerships<br>Summer engagement<br>Community building</td>
+                </tr>
+                <tr>
+                    <td>Q3-Q4 (Aug-Nov)</td>
+                    <td>Campus Events (Fall)</td>
+                    <td>• Back-to-school activation<br>• Partner with student orgs<br>• Homecoming at HBCUs</td>
+                    <td>200-250 downloads<br>Student ambassadors<br>Viral content</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h3>👥 Hiring Plan</h3>
+            <table>
+                <tr>
+                    <th>Timeline</th>
+                    <th>Role</th>
+                    <th>Hours/Week</th>
+                    <th>Responsibilities</th>
+                </tr>
+                <tr>
+                    <td>JD Dec 2025<br>Start Jan 2026</td>
+                    <td>Social Media/Content Intern</td>
+                    <td>10-15</td>
+                    <td>3-5 posts/week, influencer outreach, community engagement</td>
+                </tr>
+                <tr>
+                    <td>Apr 2026</td>
+                    <td>QA/Community Intern</td>
+                    <td>10</td>
+                    <td>Test features, document bugs, user support</td>
+                </tr>
+                <tr>
+                    <td>Mar 2026</td>
+                    <td>Campus Ambassador</td>
+                    <td>5-10</td>
+                    <td>Organize campus events, recruit ambassadors, create UGC</td>
+                </tr>
+                <tr>
+                    <td>Q3 (if found)</td>
+                    <td>Data/Research Intern</td>
+                    <td>8-10</td>
+                    <td>Build dupe database, analyze data, research brands</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h3>💰 Budget Allocation</h3>
+            <table>
+                <tr>
+                    <th>Category</th>
+                    <th>Q1</th>
+                    <th>Q2</th>
+                    <th>Q3</th>
+                    <th>Q4</th>
+                    <th>Total</th>
+                </tr>
+                <tr>
+                    <td>Paid Marketing</td>
+                    <td>$900</td>
+                    <td>$1,200</td>
+                    <td>$3,000</td>
+                    <td>$3,000</td>
+                    <td>$8,100</td>
+                </tr>
+                <tr>
+                    <td>Sample Fulfillment</td>
+                    <td>$360</td>
+                    <td>$240</td>
+                    <td>$180</td>
+                    <td>$180</td>
+                    <td>$960</td>
+                </tr>
+                <tr>
+                    <td>Events</td>
+                    <td>$0</td>
+                    <td>$800</td>
+                    <td>$500</td>
+                    <td>$800</td>
+                    <td>$2,100</td>
+                </tr>
+                <tr>
+                    <td>Tools & Software</td>
+                    <td>$300</td>
+                    <td>$300</td>
+                    <td>$500</td>
+                    <td>$500</td>
+                    <td>$1,600</td>
+                </tr>
+                <tr>
+                    <td>Intern Stipends</td>
+                    <td>$0</td>
+                    <td>$0</td>
+                    <td>$2,000</td>
+                    <td>$2,000</td>
+                    <td>$4,000</td>
+                </tr>
+                <tr>
+                    <td><strong>Total</strong></td>
+                    <td><strong>$1,560</strong></td>
+                    <td><strong>$2,540</strong></td>
+                    <td><strong>$6,180</strong></td>
+                    <td><strong>$6,480</strong></td>
+                    <td><strong>$16,760</strong></td>
+                </tr>
+            </table>
+            <p style="font-size:12px;color:#666;"><em>Q3-Q4 assumes funding secured</em></p>
+        </div>
+
+        <div class="section">
+            <h3>🎯 Fundraising Strategy</h3>
+            <table>
+                <tr>
+                    <th>Quarter</th>
+                    <th>Activity</th>
+                    <th>Goal</th>
+                </tr>
+                <tr>
+                    <td>Q1</td>
+                    <td>Build the story</td>
+                    <td>Focus on product + traction. Document journey. Create investor template.</td>
+                </tr>
+                <tr>
+                    <td>Q2</td>
+                    <td>Warm network + Prepare</td>
+                    <td>Share updates. Build list of 30-50 angels. Create deck. Get feedback.</td>
+                </tr>
+                <tr>
+                    <td>Q3</td>
+                    <td>ACTIVE FUNDRAISING</td>
+                    <td>Raise $150K-$300K preseed. Need: 2,500+ users, 1-2 brand partners, $5K+ revenue.</td>
+                </tr>
+                <tr>
+                    <td>Q4</td>
+                    <td>Close + Deploy</td>
+                    <td>Finalize round. Deploy capital: hire FT engineer, scale marketing.</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div id="q1" class="content">
+        <h2>Q1 2026: Validation Phase (Jan-Mar)</h2>
+        
+        <div class="quarter-card">
+            <h3>🎯 Quarter Goal</h3>
+            <p><strong>Validate product-market fit with early adopters</strong></p>
+            <p><strong>Success Metrics:</strong> 750 downloads | 60 sample requests | 25 purchases | 4.5+ star rating</p>
+            <p style="font-size:12px;opacity:0.8;margin-top:10px;">💡 Click any "Owners" text to edit and assign team members. Changes sync in real-time!</p>
+        </div>
+
+        <div class="section">
+            <h3>January: Launch + Customer Journey</h3>
+            
+            <div class="week-block">
+                <h4>Week 1 (Jan 1-5): 🚀 LAUNCH WEEK</h4>
+                <ul>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week1-eng')">App Store submission | PostHog tracking | Monitor P0 bugs</span></li>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week1-mkt')">First social posts | Re-engage existing influencer</span></li>
+                    <li><strong>Product:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week1-prd')">Customer journey mapping workshop</span></li>
+                    <li><strong>Hiring:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week1-hire')">Submit social intern JD</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week1-owners')">Justin (eng), You (marketing), Garima (product)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 2 (Jan 6-12): Stabilize + Journey Design</h4>
+                <ul>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week2-eng')">Fix P0 bugs | Set up PostHog funnels</span></li>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week2-mkt')">3 TikToks/Reels | Build influencer list | Review intern applications</span></li>
+                    <li><strong>Product:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week2-prd')">Design email sequences | Design push notification strategy</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week2-owners')">Justin (eng), You (marketing), Garima (product)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 3 (Jan 13-19): Journey Implementation</h4>
+                <ul>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week3-eng')">Build email notification system | Analyze drop-offs</span></li>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week3-mkt')">3 posts | First influencer outreach (5 people) | Select intern</span></li>
+                    <li><strong>Product:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week3-prd')">Write first 3 email sequences</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week3-owners')">Justin (eng), You (marketing), Garima (product)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 4 (Jan 20-26): Optimize + Onboard Intern</h4>
+                <ul>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week4-eng')">Ship email sequences | Test push notifications</span></li>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week4-mkt')">3 posts | ONBOARD SOCIAL INTERN</span></li>
+                    <li><strong>Product:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week4-prd')">Review month 1 metrics</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week4-owners')">Justin (eng), You (marketing), Garima (product)</span></p>
+            </div>
+
+            <p><strong>January Target:</strong> 200 downloads | 15 sample requests | 6 purchases</p>
+        </div>
+
+        <div class="section">
+            <h3>February: Optimize + Dupe Research</h3>
+            
+            <div class="week-block">
+                <h4>Week 5 (Jan 27-Feb 2): Journey Optimization</h4>
+                <ul>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week5-eng')">Improve sample request flow | Add A/B testing</span></li>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week5-mkt')">Intern creates 3 posts | Sign NEW influencer</span></li>
+                    <li><strong>Product:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week5-prd')">Add 2 more email sequences</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week5-owners')">Justin (eng), Social Intern (marketing), Garima (product)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 6 (Feb 3-9): Expand Notifications + Dupe Research</h4>
+                <ul>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week6-eng')">Ship optimized notifications | Start dupe research</span></li>
+                    <li><strong>Data:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week6-data')">Build dupe database (50 products)</span></li>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week6-mkt')">Intern creates 4 posts</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week6-owners')">Justin (eng), You (data), Social Intern (marketing)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 7 (Feb 10-16): Dupe Database Build</h4>
+                <ul>
+                    <li><strong>Data:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week7-data')">Continue dupe database (75 products)</span></li>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week7-eng')">Start building dupe detector UI</span></li>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week7-mkt')">Intern manages 5 posts | Sign second influencer | You recruit campus ambassador</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week7-owners')">You (data), Justin (eng), Social Intern + You (marketing)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 8 (Feb 17-23): Month Review + Campus Prep</h4>
+                <ul>
+                    <li><strong>All:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week8-all')">Month 2 metrics review | Plan March priorities</span></li>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week8-mkt')">Finalize campus ambassador selection</span></li>
+                    <li><strong>Operations:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week8-ops')">Paid ads analysis</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week8-owners')">All team (review), You (marketing + ops)</span></p>
+            </div>
+
+            <p><strong>February Target:</strong> 300 downloads | 25 sample requests | 10 purchases</p>
+        </div>
+
+        <div class="section">
+            <h3>March: Launch Dupe Detector + Campus Events</h3>
+            
+            <div class="week-block">
+                <h4>Week 9 (Feb 24-Mar 2): Dupe Detector Build</h4>
+                <ul>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week9-eng')">Build dupe detector UI | Integrate database</span></li>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week9-mkt')">Intern creates 5 posts | Start Q2 intern JDs</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week9-owners')">Justin (eng), Social Intern + You (marketing)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 10 (Mar 3-9): Ship Dupe Detector</h4>
+                <ul>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week10-eng')">Launch dupe detector MVP</span></li>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week10-mkt')">PR angle for dupe feature | Onboard campus ambassador</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week10-owners')">Justin (eng), You (marketing)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 11 (Mar 10-16): Campus Event #1</h4>
+                <ul>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week11-eng')">Add wishlist feature</span></li>
+                    <li><strong>Marketing:</strong> <strong>FIRST CAMPUS EVENT</strong> | Intern creates dupe content | PR outreach</li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week11-owners')">Justin (eng), Campus Ambassador + You (marketing)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 12 (Mar 17-23): Q1 Retro</h4>
+                <ul>
+                    <li><strong>Hiring:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week12-hire')">Interview Q2 intern candidates</span></li>
+                    <li><strong>All:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week12-all')">Q1 retrospective | Celebrate wins | Plan Q2</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q1-week12-owners')">You (hiring), All team (retro)</span></p>
+            </div>
+
+            <p><strong>March Target:</strong> 250 downloads | 20 sample requests | 9 purchases</p>
+        </div>
+
+        <div class="note">
+            <strong>Q1 Engineering Time:</strong> Jan: 100% bug fixes | Feb: 60% optimization, 40% dupe prep | Mar: 70% dupe + wishlist, 30% maintenance
+        </div>
+    </div>
+
+    <div id="q2" class="content">
+        <h2>Q2 2026: Optimization Phase (Apr-Jun)</h2>
+        
+        <div class="quarter-card">
+            <h3>🎯 Quarter Goal</h3>
+            <p><strong>Improve conversion + scale in-person marketing</strong></p>
+            <p><strong>Success Metrics:</strong> 1,500 downloads | 30% conversion | 60 MTU | First brand partner | 4 campus events | Attend Ulta Beauty World</p>
+            <p style="font-size:12px;opacity:0.8;margin-top:10px;">💡 Click any task or owner text to edit. Changes sync in real-time!</p>
+        </div>
+
+        <div class="section">
+            <h3>April: Ulta Beauty World + Campus Events</h3>
+            
+            <div class="week-block">
+                <h4>Week 13 (Mar 24-30): Ulta Beauty World Prep</h4>
+                <ul>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week13-mkt')">Finalize Ulta Beauty World prep | Create pitch materials | Book travel</span></li>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week13-eng')">Optimize app performance | Fix reported bugs</span></li>
+                    <li><strong>Hiring:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week13-hire')">Onboard QA/Community intern</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week13-owners')">You (marketing), Justin (eng), You (hiring)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 14 (Mar 31-Apr 6): Pre-Event Week</h4>
+                <ul>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week14-mkt')">Final Ulta prep | Print materials | Prepare demo script</span></li>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week14-eng')">Start expanding dupe detector database to 100 products</span></li>
+                    <li><strong>Product:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week14-prd')">Design brand analytics dashboard wireframes</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week14-owners')">You (marketing), Justin (eng), Garima (product)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 15 (Apr 7-13): Final Prep + Travel</h4>
+                <ul>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week15-mkt')">Pack materials | Review target brand list | Travel to Orlando</span></li>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week15-eng')">Continue dupe database expansion</span></li>
+                    <li><strong>All:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week15-all')">Review Q2 goals and priorities</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week15-owners')">You (marketing + travel), Justin (eng)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 16 (Apr 14-20): 🎪 ULTA BEAUTY WORLD (Apr 16)</h4>
+                <ul>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week16-mkt')">ATTEND EVENT | Network with 20+ brands | Collect contacts | Demo app</span></li>
+                    <li><strong>Post-Event:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week16-post')">Document learnings | Organize contacts | Send follow-up emails</span></li>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week16-eng')">Monitor app during event | Fix any critical issues</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week16-owners')">You (event), Justin (eng support)</span></p>
+            </div>
+
+            <p><strong>April Target:</strong> 400 downloads | 30 sample requests | 12 purchases | 40 MTU</p>
+        </div>
+
+        <div class="section">
+            <h3>May: Brand Tools + Partnerships</h3>
+            
+            <div class="week-block">
+                <h4>Week 17 (Apr 21-27): Event Follow-up + Campus Event #2</h4>
+                <ul>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week17-mkt')">Follow up with all Ulta contacts | CAMPUS EVENT #2 | Create post-event content</span></li>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week17-eng')">Complete dupe detector expansion to 100 products</span></li>
+                    <li><strong>Data:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week17-data')">Analyze Q1 metrics | Identify improvement areas</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week17-owners')">You (marketing), Justin (eng), QA Intern (data)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 18 (Apr 28-May 4): Brand Dashboard Build</h4>
+                <ul>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week18-eng')">Start building brand analytics dashboard</span></li>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week18-mkt')">Prepare brand partnership pitch deck | Target 5 brands for outreach</span></li>
+                    <li><strong>Product:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week18-prd')">Finalize dashboard requirements | Plan user reviews feature</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week18-owners')">Justin (eng), You (marketing), Garima (product)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 19 (May 5-11): Brand Outreach + Dashboard Dev</h4>
+                <ul>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week19-mkt')">Outreach to 10 indie brands | CAMPUS EVENT #3 prep</span></li>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week19-eng')">Continue dashboard build | Expand dupe database to 150 products</span></li>
+                    <li><strong>Data:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week19-data')">Add products to dupe database</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week19-owners')">You (marketing), Justin (eng), QA Intern (data)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 20 (May 12-18): Campus Event #3 + Dashboard MVP</h4>
+                <ul>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week20-mkt')">CAMPUS EVENT #3 | Follow up with interested brands</span></li>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week20-eng')">Ship brand analytics dashboard MVP | Complete dupe database (200 products)</span></li>
+                    <li><strong>Product:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week20-prd')">Test dashboard with friendly brand | Gather feedback</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week20-owners')">Campus Ambassador (event), Justin (eng), You (product testing)</span></p>
+            </div>
+
+            <p><strong>May Target:</strong> 500 downloads | 35 sample requests | 15 purchases | 50 MTU</p>
+        </div>
+
+        <div class="section">
+            <h3>June: Close First Partnership</h3>
+            
+            <div class="week-block">
+                <h4>Week 21 (May 19-25): Partnership Negotiations</h4>
+                <ul>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week21-mkt')">Active negotiations with 2-3 top brand prospects | CAMPUS EVENT #4 prep</span></li>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week21-eng')">Start building user reviews/ratings feature</span></li>
+                    <li><strong>Operations:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week21-ops')">Draft partnership agreement template</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week21-owners')">You (marketing + ops), Justin (eng)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 22 (May 26-Jun 1): Campus Event #4 + Reviews Feature</h4>
+                <ul>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week22-mkt')">CAMPUS EVENT #4 | Push for partnership close</span></li>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week22-eng')">Continue reviews feature development</span></li>
+                    <li><strong>All:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week22-all')">Month review | Adjust Q2 goals if needed</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week22-owners')">Campus Ambassador (event), Justin (eng), All team (review)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 23 (Jun 2-8): 🤝 SIGN FIRST BRAND PARTNER</h4>
+                <ul>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week23-mkt')">CLOSE PARTNERSHIP DEAL | Announce partnership | PR push</span></li>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week23-eng')">Finalize reviews feature | Test with users</span></li>
+                    <li><strong>Operations:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week23-ops')">Finalize partnership contract | Set up payment/tracking</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week23-owners')">You (partnership), Justin (eng), You (ops)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 24 (Jun 9-15): Investor Deck + Q2 Retro</h4>
+                <ul>
+                    <li><strong>All:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week24-all')">Q2 retrospective | Celebrate wins!</span></li>
+                    <li><strong>Fundraising:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week24-fund')">Draft investor deck v1 | Get feedback from mentors</span></li>
+                    <li><strong>Product:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week24-prd')">Plan Q3 priorities | Document brand partnership learnings</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q2-week24-owners')">All team (retro), You (fundraising), Garima (product planning)</span></p>
+            </div>
+
+            <p><strong>June Target:</strong> 600 downloads | 40 sample requests | 18 purchases | 60 MTU | 30% conversion rate</p>
+        </div>
+
+        <div class="note">
+            <strong>Q2 Engineering Focus:</strong> 50% brand tools | 30% expanding dupe DB | 20% maintenance<br>
+            <strong>Ulta Beauty World Details:</strong> April 16, 2026 in Orlando, FL. Budget: $800 (ticket + travel). Goal: Network with 20+ indie brands, collect 10+ qualified leads for partnerships.
+        </div>
+    </div>
+
+    <div id="q3" class="content">
+        <h2>Q3 2026: Growth + Fundraising Phase (Jul-Sep)</h2>
+        
+        <div class="quarter-card">
+            <h3>🎯 Quarter Goal</h3>
+            <p><strong>Scale acquisition + secure partnerships + RAISE PRESEED</strong></p>
+            <p><strong>Success Metrics:</strong> 3,500 total users | 2 brand partners | 80 MTU | $150K-$300K raised | Follow-up on Q2 event contacts</p>
+            <p style="font-size:12px;opacity:0.8;margin-top:10px;">💡 Click any task or owner text to edit. Changes sync in real-time!</p>
+        </div>
+
+        <div class="section">
+            <h3>July: Reviews + Fundraising Prep</h3>
+            
+            <div class="week-block">
+                <h4>Week 25 (Jun 16-22): Launch Reviews Feature</h4>
+                <ul>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week25-eng')">SHIP user reviews/ratings feature | Monitor for bugs</span></li>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week25-mkt')">Promote reviews feature | Encourage first reviews</span></li>
+                    <li><strong>Fundraising:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week25-fund')">Share investor deck with 5 friendly angels for feedback</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week25-owners')">Justin (eng), Social Intern (marketing), You (fundraising)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 26 (Jun 23-29): Brand Follow-up + Investor Prep</h4>
+                <ul>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week26-mkt')">Follow up with Ulta Beauty World contacts | Partner with 1-2 more influencers</span></li>
+                    <li><strong>Fundraising:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week26-fund')">Refine investor deck based on feedback | Build investor list (30-50 angels)</span></li>
+                    <li><strong>Operations:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week26-ops')">Scale paid ads to $500/month</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week26-owners')">You (marketing + fundraising), Social Intern (ads)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 27 (Jun 30-Jul 6): Partnership #2 Negotiations</h4>
+                <ul>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week27-mkt')">Active negotiations with 2nd brand partner | Partner with remaining influencers</span></li>
+                    <li><strong>Fundraising:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week27-fund')">Begin warm outreach to angel investors | Schedule intro calls</span></li>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week27-eng')">Optimize reviews feature based on feedback</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week27-owners')">You (partnerships + fundraising), Justin (eng)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 28 (Jul 7-13): Month Review + Fundraising Kickoff</h4>
+                <ul>
+                    <li><strong>All:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week28-all')">Month review | Adjust Q3 strategy</span></li>
+                    <li><strong>Fundraising:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week28-fund')">Investor calls (5-10) | Refine pitch based on feedback</span></li>
+                    <li><strong>Hiring:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week28-hire')">Consider posting Data/Research intern JD</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week28-owners')">All team (review), You (fundraising + hiring)</span></p>
+            </div>
+
+            <p><strong>July Target:</strong> 600 downloads | 45 sample requests | 20 purchases | 120 MTU</p>
+        </div>
+
+        <div class="section">
+            <h3>August: Active Fundraising</h3>
+            
+            <div class="week-block">
+                <h4>Week 29 (Jul 14-20): 🤝 CLOSE PARTNERSHIP #2</h4>
+                <ul>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week29-mkt')">SIGN 2ND BRAND PARTNER | Announce partnership | PR push</span></li>
+                    <li><strong>Fundraising:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week29-fund')">Active pitching - 10-15 investor meetings</span></li>
+                    <li><strong>Operations:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week29-ops')">Set up 2nd partnership tracking | Update metrics</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week29-owners')">You (partnership + fundraising), QA Intern (ops)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 30 (Jul 21-27): Fundraising Push + Summer Events</h4>
+                <ul>
+                    <li><strong>Fundraising:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week30-fund')">Continue investor meetings (10-15) | Send follow-ups</span></li>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week30-mkt')">Explore local beauty pop-ups or summer events</span></li>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week30-eng')">Optimize notification timing based on data</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week30-owners')">You (fundraising + marketing), Justin (eng)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 31 (Jul 28-Aug 3): Hiring + Continued Pitching</h4>
+                <ul>
+                    <li><strong>Fundraising:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week31-fund')">Investor meetings (5-10) | Track commitments</span></li>
+                    <li><strong>Hiring:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week31-hire')">If needed, onboard Data/Research intern</span></li>
+                    <li><strong>Product:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week31-prd')">Plan 90-day retention improvements</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week31-owners')">You (fundraising + hiring), Garima (product)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 32 (Aug 4-10): Month Review + Final Push</h4>
+                <ul>
+                    <li><strong>All:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week32-all')">Month review | Celebrate 2nd partnership</span></li>
+                    <li><strong>Fundraising:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week32-fund')">Final investor meetings (5-10) | Begin closing conversations</span></li>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week32-eng')">Implement retention improvements</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week32-owners')">All team (review), You (fundraising), Justin (eng)</span></p>
+            </div>
+
+            <p><strong>August Target:</strong> 700 downloads | 50 sample requests | 25 purchases | 130 MTU</p>
+        </div>
+
+        <div class="section">
+            <h3>September: Close Fundraise</h3>
+            
+            <div class="week-block">
+                <h4>Week 33 (Aug 11-17): Closing Term Sheets</h4>
+                <ul>
+                    <li><strong>Fundraising:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week33-fund')">Negotiate term sheets | Work with legal on docs</span></li>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week33-mkt')">Maintain momentum - continue paid ads and content</span></li>
+                    <li><strong>Operations:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week33-ops')">Prepare for fund deployment - create hiring plan</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week33-owners')">You (fundraising + ops), Social Intern (marketing)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 34 (Aug 18-24): 💰 CLOSE PRESEED ROUND</h4>
+                <ul>
+                    <li><strong>Fundraising:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week34-fund')">CLOSE $150K-$300K PRESEED | Wire funds | Announce to team</span></li>
+                    <li><strong>Operations:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week34-ops')">Set up bank accounts | Create deployment plan</span></li>
+                    <li><strong>All:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week34-all')">CELEBRATE! 🎉</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week34-owners')">You (fundraising + ops), All team (celebration)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 35 (Aug 25-31): Q4 Planning</h4>
+                <ul>
+                    <li><strong>Product:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week35-prd')">Improve 90-day retention strategies | Target 20%</span></li>
+                    <li><strong>Operations:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week35-ops')">Detail Q4 budget | Plan capital deployment | Create hiring timeline</span></li>
+                    <li><strong>All:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week35-all')">Review Q3 learnings | Set Q4 priorities</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week35-owners')">Garima (product), You (ops), All team (planning)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 36 (Sep 1-7): Q3 Retro + Prep Q4</h4>
+                <ul>
+                    <li><strong>All:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week36-all')">Q3 retrospective | Document wins and learnings</span></li>
+                    <li><strong>Hiring:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week36-hire')">Begin recruiting for FT engineer or ops lead (if budget allows)</span></li>
+                    <li><strong>Product:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week36-prd')">Finalize Q4 product roadmap with funding secured</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q3-week36-owners')">All team (retro), You (hiring), Garima (product)</span></p>
+            </div>
+
+            <p><strong>September Target:</strong> 700 downloads | 50 sample requests | 25 purchases | 150 MTU</p>
+        </div>
+
+        <div class="note">
+            <strong>Q3 Focus:</strong> Fundraising is THE priority. Marketing and product work continues but everyone supports the fundraise.<br>
+            <strong>Target Fundraise:</strong> $150K-$300K preseed | 20-30 angel investors | Key metrics needed: 2,500+ users, 2 brand partners, early revenue signals
+        </div>
+    </div>
+
+    <div id="q4" class="content">
+        <h2>Q4 2026: Scale Phase (Oct-Dec)</h2>
+        
+        <div class="quarter-card">
+            <h3>🎯 Quarter Goal</h3>
+            <p><strong>Close fundraise + prove revenue model</strong></p>
+            <p><strong>Success Metrics:</strong> 5,000 total users | 3 brand partners | 100+ MTU | $15K+ revenue | Deploy funding</p>
+            <p style="font-size:12px;opacity:0.8;margin-top:10px;">💡 Click any task or owner text to edit. Changes sync in real-time!</p>
+        </div>
+
+        <div class="section">
+            <h3>October: Partnership #3 + Deploy Capital</h3>
+            
+            <div class="week-block">
+                <h4>Week 37 (Sep 8-14): BeautyMatter Summit Prep</h4>
+                <ul>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week37-mkt')">Decide on BeautyMatter NEXT Summit (Oct 4-5) | If yes, prep materials</span></li>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week37-eng')">Start planning technical roadmap with funding</span></li>
+                    <li><strong>Operations:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week37-ops')">Begin capital deployment | Review burn rate projections</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week37-owners')">You (marketing + ops), Justin (eng)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 38 (Sep 15-21): Partnership #3 Negotiations</h4>
+                <ul>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week38-mkt')">Active negotiations with 3rd brand partner | Campus event planning</span></li>
+                    <li><strong>Operations:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week38-ops')">Document partnership case studies from brands 1 & 2</span></li>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week38-eng')">Bug fixes and optimization</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week38-owners')">You (partnerships + ops), Justin (eng)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 39 (Sep 22-28): Back-to-School Campus Events</h4>
+                <ul>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week39-mkt')">BACK-TO-SCHOOL CAMPUS EVENTS | Leverage fall semester energy</span></li>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week39-eng')">Prepare for potential FT hire | Document systems</span></li>
+                    <li><strong>Hiring:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week39-hire')">Review FT engineer candidates | Begin interviews</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week39-owners')">Campus Ambassador (events), Justin (eng), You (hiring)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 40 (Sep 29-Oct 5): BeautyMatter Summit + Partnership Close</h4>
+                <ul>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week40-mkt')">Attend BeautyMatter (Oct 4-5) if decided | SIGN 3RD BRAND PARTNER</span></li>
+                    <li><strong>Operations:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week40-ops')">Set up 3rd partnership tracking | Announce milestone</span></li>
+                    <li><strong>All:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week40-all')">Month review | Celebrate 3 partnerships!</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week40-owners')">You (marketing + ops), All team (celebration)</span></p>
+            </div>
+
+            <p><strong>October Target:</strong> 800 downloads | 50 sample requests | 30 purchases | 160 MTU | $3K revenue</p>
+        </div>
+
+        <div class="section">
+            <h3>November: Holiday Marketing Push</h3>
+            
+            <div class="week-block">
+                <h4>Week 41 (Oct 6-12): Holiday Campaign Planning</h4>
+                <ul>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week41-mkt')">Plan holiday marketing campaigns | Create content calendar</span></li>
+                    <li><strong>Operations:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week41-ops')">Coordinate with brand partners on holiday promotions</span></li>
+                    <li><strong>Hiring:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week41-hire')">Make FT engineer offer (if decided) | Plan onboarding</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week41-owners')">Social Intern (marketing), You (ops + hiring)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 42 (Oct 13-19): Launch Holiday Campaigns</h4>
+                <ul>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week42-mkt')">LAUNCH holiday campaigns | Scale paid ads to $1K/month</span></li>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week42-eng')">Optimize all conversion funnels for holiday push</span></li>
+                    <li><strong>Operations:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week42-ops')">Monitor increased traffic and performance</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week42-owners')">Social Intern + You (marketing), Justin (eng), QA Intern (ops)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 43 (Oct 20-26): Black Friday Prep</h4>
+                <ul>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week43-mkt')">Black Friday campaign prep | Coordinate partner promotions</span></li>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week43-eng')">Ensure app stability for high traffic | Load testing</span></li>
+                    <li><strong>Operations:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week43-ops')">Set up promotion tracking | Revenue monitoring</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week43-owners')">You + Social Intern (marketing), Justin (eng), QA Intern (ops)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 44 (Oct 27-Nov 2): 🛍️ BLACK FRIDAY / CYBER MONDAY</h4>
+                <ul>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week44-mkt')">EXECUTE BF/CM promotions | Real-time optimization</span></li>
+                    <li><strong>All:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week44-all')">All hands - monitor app, support users, track sales</span></li>
+                    <li><strong>Operations:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week44-ops')">Daily revenue reporting | Document what works</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week44-owners')">All team (BF/CM execution)</span></p>
+            </div>
+
+            <p><strong>November Target:</strong> 1,000 downloads | 60 sample requests | 40 purchases | 180 MTU | $4K revenue</p>
+        </div>
+
+        <div class="section">
+            <h3>December: Year-End + 2027 Planning</h3>
+            
+            <div class="week-block">
+                <h4>Week 45 (Nov 3-9): Post-Holiday Analysis</h4>
+                <ul>
+                    <li><strong>All:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week45-all')">Analyze BF/CM results | Document learnings</span></li>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week45-mkt')">Continue holiday momentum | Maintain high ad spend</span></li>
+                    <li><strong>Operations:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week45-ops')">Update revenue projections | Track toward $15K goal</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week45-owners')">All team (analysis), You (ops)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 46 (Nov 10-16): Holiday Gift Season</h4>
+                <ul>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week46-mkt')">Holiday gift content | Partner with beauty influencers</span></li>
+                    <li><strong>Engineering:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week46-eng')">Onboard FT engineer (if hired) | Knowledge transfer</span></li>
+                    <li><strong>Product:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week46-prd')">Begin 2027 roadmap planning</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week46-owners')">Social Intern (marketing), Justin + New Hire (eng), Garima (product)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 47 (Nov 17-23): Push to $15K Revenue</h4>
+                <ul>
+                    <li><strong>Operations:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week47-ops')">PUSH TO HIT $15K ANNUAL REVENUE | Daily tracking</span></li>
+                    <li><strong>Marketing:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week47-mkt')">Final holiday push | Maximize conversions</span></li>
+                    <li><strong>All:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week47-all')">Team effort to hit annual goal</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week47-owners')">You (ops + revenue), All team (support)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 48 (Nov 24-30): 🎉 ANNUAL RETROSPECTIVE</h4>
+                <ul>
+                    <li><strong>All:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week48-all')">Annual retrospective | Celebrate ALL wins! | Document 2026 learnings</span></li>
+                    <li><strong>Product:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week48-prd')">Finalize 2027 product roadmap with funding</span></li>
+                    <li><strong>Hiring:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week48-hire')">Plan 2027 hiring (ops lead? designer? more engineers?)</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week48-owners')">All team (retro + celebration), You (2027 planning)</span></p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 49-52 (Dec): Holiday Break + Light Planning</h4>
+                <ul>
+                    <li><strong>All:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week49-all')">Team holiday break! Light duty only | Rest and recharge</span></li>
+                    <li><strong>Operations:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week49-ops')">Monitor app | Emergency support only</span></li>
+                    <li><strong>Planning:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week49-plan')">Finalize Q1 2027 plan | Prepare for January launch</span></li>
+                </ul>
+                <button class="add-task-btn" onclick="addTask(this)">+ Add Task</button>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> <span class="editable" onclick="makeTextEditable(this, 'q4-week49-owners')">Light rotation for ops, mostly BREAK TIME! 🏖️</span></p>
+            </div>
+
+            <p><strong>December Target:</strong> 1,200 downloads | 70 sample requests | 50 purchases | 200 MTU | $8K+ revenue</p>
+        </div>
+
+        <div class="note">
+            <strong>Key Focus:</strong> Prove revenue model | Scale with funding | Prepare for growth phase in 2027<br>
+            <strong>Success = </strong> Hit $15K+ revenue | 3 brand partners delivering value | 5,000+ total users | Team positioned for scale
+        </div>
+    </div>
+
+    <div id="tasks" class="content">
+        <h2>✅ Weekly Tasks</h2>
+        
+        <div class="instructions">
+            <h4>How to Use This Tracker</h4>
+            <p><strong>Wednesday Meeting:</strong> Review tasks, update status, assign new micro-tasks<br>
+            <strong>Recommendation:</strong> For ACTIVE daily tracking, use a simple Google Sheet with columns: Week #, Task, Owner, Priority, Status, Notes. Keep this HTML for big-picture planning!</p>
+        </div>
+
+        <div class="section">
+            <h3>Current Week Template</h3>
+            <table>
+                <tr>
+                    <th style="width: 5%">#</th>
+                    <th style="width: 15%">Area</th>
+                    <th style="width: 35%">Task</th>
+                    <th style="width: 12%">Owner</th>
+                    <th style="width: 10%">Priority</th>
+                    <th style="width: 8%">Hours</th>
+                    <th style="width: 15%">Status</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Engineering</td>
+                    <td>[Task description - what needs to be done]</td>
+                    <td>[Team member]</td>
+                    <td>P0/P1/P2/P3</td>
+                    <td>[Est hours]</td>
+                    <td>Not Started</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Marketing</td>
+                    <td>[Task description - be specific]</td>
+                    <td>[Team member]</td>
+                    <td>P0/P1/P2/P3</td>
+                    <td>[Est hours]</td>
+                    <td>In Progress</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Product</td>
+                    <td>[Task description]</td>
+                    <td>[Team member]</td>
+                    <td>P0/P1/P2/P3</td>
+                    <td>[Est hours]</td>
+                    <td>Done</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h3>Priority Definitions</h3>
+            <ul>
+                <li><strong>P0 - Drop Everything:</strong> App crashes, core flow broken, data loss, security issues. Fix immediately.</li>
+                <li><strong>P1 - Fix This Week:</strong> Features that give wrong results, significant UX friction. ROI Score 70+. Fix within 1-2 weeks.</li>
+                <li><strong>P2 - Fix Next Sprint:</strong> Minor UX annoyances, edge cases affecting <10% users. ROI Score 40-69. Fix within 1 month.</li>
+                <li><strong>P3 - Backlog:</strong> Nice-to-haves, visual polish. ROI Score <40. Fix when slow.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>ICE + ROI Scoring Framework</h3>
+            <p>For every bug or feature request:</p>
+            <ul>
+                <li><strong>Impact</strong> (1-10): How much does this affect UX or revenue?</li>
+                <li><strong>Confidence</strong> (1-10): How sure are we this matters?</li>
+                <li><strong>Ease</strong> (1-10): How easy is it to build?</li>
+                <li><strong>ROI Score = (Impact × Confidence) / Ease</strong></li>
+            </ul>
+            <p><strong>Example:</strong> Bug causing 20% drop-off at checkout → Impact: 10, Confidence: 9, Ease: 7 → ROI: (10×9)/7 = 12.9 → P1</p>
+        </div>
+
+        <div class="section">
+            <h3>Wednesday Meeting Agenda Template</h3>
+            <div style="background: #f8f9ff; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                <p><strong>Date:</strong> [MM/DD/YYYY]</p>
+                <p><strong>Attendees:</strong> [Names]</p>
+                <p><strong>Last Week Wins:</strong></p>
+                <ul>
+                    <li>[What shipped? What got done?]</li>
+                    <li>[What metrics moved?]</li>
+                </ul>
+                <p><strong>Key Metrics Update:</strong></p>
+                <ul>
+                    <li>Downloads this week: [#]</li>
+                    <li>Sample requests: [#]</li>
+                    <li>Purchases: [#]</li>
+                    <li>Top drop-off point: [Screen/step from PostHog]</li>
+                </ul>
+                <p><strong>This Week Top 3 Priorities:</strong></p>
+                <ol>
+                    <li>[Priority 1 with owner assigned]</li>
+                    <li>[Priority 2 with owner assigned]</li>
+                    <li>[Priority 3 with owner assigned]</li>
+                </ol>
+                <p><strong>Blockers/Concerns:</strong></p>
+                <ul>
+                    <li>[What's blocking progress? What help is needed?]</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Decision Framework for New Features</h3>
+            <p>When someone suggests a new feature, ask:</p>
+            <ol>
+                <li><strong>Does this directly increase purchases or reduce drop-off?</strong> (If no → backlog)</li>
+                <li><strong>Can we build an MVP in <40 engineering hours?</strong> (If no → break it down or cut)</li>
+                <li><strong>Does this support our brand partnership pitch?</strong> (If yes → bonus points)</li>
+            </ol>
+            <p>If a feature doesn't score 2/3 "yes" answers, defer it to 2027.</p>
+        </div>
+
+        <div class="section">
+            <h3>Your "NO" List for 2026</h3>
+            <ul>
+                <li>❌ AI makeup artist consultations (too complex, too expensive)</li>
+                <li>❌ Custom filters / AR try-on (not your differentiator, very expensive)</li>
+                <li>❌ Social features / community (adds complexity, requires moderation)</li>
+                <li>❌ Any feature that requires >40 engineering hours</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="metrics" class="content">
+        <h2>📊 Metrics Dashboard</h2>
+        <button class="export-btn" onclick="exportData()">📥 Export to CSV</button>
+        <p style="color: #667eea;">💡 Click any "Actual" cell to edit. Changes sync across your team in ~10 seconds!</p>
+        
+        <div id="metricsContainer">Loading metrics...</div>
+    </div>
+
+    <script>
+        // Initialize Supabase client (ONLY ONCE)
+        const sbClient = window.supabase.createClient(
+            'https://yohzdpshfxazvfcwobxb.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlvaHpkcHNoZnhhenZmY3dvYnhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMjY5NTgsImV4cCI6MjA4MjYwMjk1OH0.th16vrzPpghofqy9k54wEX1pOHM7s-u2n4Ih_-jiQLg'
+        );
+
+        let metricsCache = {};
+
+        // Tab switching function
+        function switchTab(tabName) {
+            document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'metrics') {
+                renderMetrics();
+            }
+        }
+
+        // Initialize metrics in database
+        async function initMetrics() {
+            const setup = [
+                // Q1
+                {q: 'Q1', m: 'Jan', metrics: {Downloads: '200', 'Sample Requests': '15', Purchases: '6', MTU: '5'}},
+                {q: 'Q1', m: 'Feb', metrics: {Downloads: '300', 'Sample Requests': '25', Purchases: '10', MTU: '10'}},
+                {q: 'Q1', m: 'Mar', metrics: {Downloads: '250', 'Sample Requests': '20', Purchases: '9', MTU: '15'}},
+                // Q2
+                {q: 'Q2', m: 'Apr', metrics: {Downloads: '400', 'Sample Requests': '30', Purchases: '12', MTU: '40'}},
+                {q: 'Q2', m: 'May', metrics: {Downloads: '500', 'Sample Requests': '35', Purchases: '15', MTU: '50'}},
+                {q: 'Q2', m: 'Jun', metrics: {Downloads: '600', 'Sample Requests': '40', Purchases: '18', MTU: '60'}},
+                // Q3
+                {q: 'Q3', m: 'Jul', metrics: {Downloads: '600', 'Sample Requests': '45', Purchases: '20', MTU: '120'}},
+                {q: 'Q3', m: 'Aug', metrics: {Downloads: '700', 'Sample Requests': '50', Purchases: '25', MTU: '130'}},
+                {q: 'Q3', m: 'Sep', metrics: {Downloads: '700', 'Sample Requests': '50', Purchases: '25', MTU: '150'}},
+                // Q4
+                {q: 'Q4', m: 'Oct', metrics: {Downloads: '800', 'Sample Requests': '50', Purchases: '30', MTU: '160'}},
+                {q: 'Q4', m: 'Nov', metrics: {Downloads: '1000', 'Sample Requests': '60', Purchases: '40', MTU: '180'}},
+                {q: 'Q4', m: 'Dec', metrics: {Downloads: '1200', 'Sample Requests': '70', Purchases: '50', MTU: '200'}}
+            ];
+
+            for (const item of setup) {
+                for (const [name, target] of Object.entries(item.metrics)) {
+                    const {data: existing} = await sbClient.from('metrics')
+                        .select().eq('quarter', item.q).eq('month', item.m).eq('metric_name', name).single();
+                    
+                    if (!existing) {
+                        await sbClient.from('metrics').insert({
+                            quarter: item.q, month: item.m, metric_name: name, target, actual: ''
+                        });
+                    }
+                }
+            }
+        }
+
+        // Load metrics from database
+        async function loadMetrics() {
+            const {data} = await sbClient.from('metrics').select('*');
+            if (data) {
+                metricsCache = {};
+                data.forEach(row => {
+                    const key = `${row.quarter}-${row.month}-${row.metric_name}`;
+                    metricsCache[key] = row;
+                });
+            }
+        }
+
+        // Save metric to database
+        async function saveMetric(quarter, month, name, value) {
+            await sbClient.from('metrics').update({actual: value})
+                .eq('quarter', quarter).eq('month', month).eq('metric_name', name);
+            await loadMetrics();
+            renderMetrics();
+        }
+
+        // Make cell editable
+        function makeEditable(el, q, m, name) {
+            const val = el.textContent.trim();
+            el.innerHTML = `<input type="text" value="${val}" style="width:60px;border:1px solid #667eea;padding:4px;border-radius:4px;"/>`;
+            const input = el.querySelector('input');
+            input.focus();
+            input.select();
+
+            const save = () => {
+                const newVal = input.value.trim();
+                el.textContent = newVal || '-';
+                saveMetric(q, m, name, newVal);
+            };
+
+            input.onblur = save;
+            input.onkeypress = (e) => { if (e.key === 'Enter') save(); };
+        }
+
+        // Make text editable (for owners, notes, etc.)
+        async function makeTextEditable(el, key) {
+            const val = el.textContent.trim();
+            el.innerHTML = `<input type="text" value="${val}" style="width:300px;border:1px solid #C6A587;padding:4px;border-radius:4px;"/>`;
+            const input = el.querySelector('input');
+            input.focus();
+            input.select();
+
+            const save = async () => {
+                const newVal = input.value.trim();
+                el.textContent = newVal;
+                
+                // Save to Supabase
+                const {data: existing} = await sbClient.from('text_fields')
+                    .select().eq('field_key', key).single();
+                
+                if (existing) {
+                    await sbClient.from('text_fields').update({field_value: newVal})
+                        .eq('field_key', key);
+                } else {
+                    await sbClient.from('text_fields').insert({
+                        field_key: key, field_value: newVal
+                    });
+                }
+            };
+
+            input.onblur = save;
+            input.onkeypress = (e) => { if (e.key === 'Enter') save(); };
+        }
+
+        // Load text fields from database
+        async function loadTextFields() {
+            const {data} = await sbClient.from('text_fields').select('*');
+            if (data) {
+                data.forEach(row => {
+                    const el = document.querySelector(`[onclick*="${row.field_key}"]`);
+                    if (el) {
+                        el.textContent = row.field_value;
+                    }
+                });
+            }
+        }
+
+        // Add a new task to a week block
+        async function addTask(button) {
+            const weekBlock = button.parentElement;
+            const ul = weekBlock.querySelector('ul');
+            
+            // Generate unique key for this task
+            const weekId = weekBlock.querySelector('h4').textContent.match(/Week \d+/)[0].replace(' ', '').toLowerCase();
+            const taskCount = ul.querySelectorAll('li').length;
+            const uniqueKey = `${weekId}-task${taskCount + 1}-${Date.now()}`;
+            
+            // Prompt for category and task description
+            const category = prompt('Task category (e.g., Engineering, Marketing, Product, Operations, All):', 'General');
+            if (!category) return;
+            
+            const taskDesc = prompt('Task description:', '');
+            if (!taskDesc) return;
+            
+            // Create new list item
+            const newLi = document.createElement('li');
+            newLi.innerHTML = `<strong>${category}:</strong> <span class="editable" onclick="makeTextEditable(this, '${uniqueKey}')">${taskDesc}</span> <button class="delete-task-btn" onclick="deleteTask(this, '${uniqueKey}')">✕</button>`;
+            
+            ul.appendChild(newLi);
+            
+            // Save to database
+            await sbClient.from('text_fields').insert({
+                field_key: uniqueKey,
+                field_value: taskDesc
+            });
+            
+            // Also save task metadata (category, week, etc.) for reconstruction
+            await sbClient.from('custom_tasks').insert({
+                task_key: uniqueKey,
+                week_id: weekId,
+                category: category,
+                description: taskDesc
+            });
+        }
+
+        // Delete a task
+        async function deleteTask(button, taskKey) {
+            if (!confirm('Delete this task?')) return;
+            
+            const li = button.parentElement;
+            li.remove();
+            
+            // Delete from database
+            await sbClient.from('text_fields').delete().eq('field_key', taskKey);
+            await sbClient.from('custom_tasks').delete().eq('task_key', taskKey);
+        }
+
+        // Load custom tasks from database
+        async function loadCustomTasks() {
+            const {data} = await sbClient.from('custom_tasks').select('*');
+            if (data && data.length > 0) {
+                data.forEach(task => {
+                    // Find the week block by week_id
+                    const weekBlocks = document.querySelectorAll('.week-block');
+                    for (const block of weekBlocks) {
+                        const h4 = block.querySelector('h4');
+                        if (h4 && h4.textContent.match(/Week \d+/)[0].replace(' ', '').toLowerCase() === task.week_id) {
+                            const ul = block.querySelector('ul');
+                            
+                            // Check if this task already exists (to avoid duplicates)
+                            const existingTask = ul.querySelector(`[onclick*="${task.task_key}"]`);
+                            if (existingTask) continue;
+                            
+                            // Create new list item
+                            const newLi = document.createElement('li');
+                            newLi.innerHTML = `<strong>${task.category}:</strong> <span class="editable" onclick="makeTextEditable(this, '${task.task_key}')">${task.description}</span> <button class="delete-task-btn" onclick="deleteTask(this, '${task.task_key}')">✕</button>`;
+                            ul.appendChild(newLi);
+                            break;
+                        }
+                    }
+                });
+            }
+        }
+
+        // Render metrics dashboard
+        function renderMetrics() {
+            const quarters = [
+                {id: 'Q1', name: 'Q1 2026 (Jan-Mar)', months: ['Jan','Feb','Mar']},
+                {id: 'Q2', name: 'Q2 2026 (Apr-Jun)', months: ['Apr','May','Jun']},
+                {id: 'Q3', name: 'Q3 2026 (Jul-Sep)', months: ['Jul','Aug','Sep']},
+                {id: 'Q4', name: 'Q4 2026 (Oct-Dec)', months: ['Oct','Nov','Dec']}
+            ];
+            const metricNames = ['Downloads', 'Sample Requests', 'Purchases', 'MTU'];
+
+            // Default targets if not in database yet
+            const defaultTargets = {
+                'Q1-Jan-Downloads': '200', 'Q1-Jan-Sample Requests': '15', 'Q1-Jan-Purchases': '6', 'Q1-Jan-MTU': '5',
+                'Q1-Feb-Downloads': '300', 'Q1-Feb-Sample Requests': '25', 'Q1-Feb-Purchases': '10', 'Q1-Feb-MTU': '10',
+                'Q1-Mar-Downloads': '250', 'Q1-Mar-Sample Requests': '20', 'Q1-Mar-Purchases': '9', 'Q1-Mar-MTU': '15',
+                'Q2-Apr-Downloads': '400', 'Q2-Apr-Sample Requests': '30', 'Q2-Apr-Purchases': '12', 'Q2-Apr-MTU': '40',
+                'Q2-May-Downloads': '500', 'Q2-May-Sample Requests': '35', 'Q2-May-Purchases': '15', 'Q2-May-MTU': '50',
+                'Q2-Jun-Downloads': '600', 'Q2-Jun-Sample Requests': '40', 'Q2-Jun-Purchases': '18', 'Q2-Jun-MTU': '60',
+                'Q3-Jul-Downloads': '600', 'Q3-Jul-Sample Requests': '45', 'Q3-Jul-Purchases': '20', 'Q3-Jul-MTU': '120',
+                'Q3-Aug-Downloads': '700', 'Q3-Aug-Sample Requests': '50', 'Q3-Aug-Purchases': '25', 'Q3-Aug-MTU': '130',
+                'Q3-Sep-Downloads': '700', 'Q3-Sep-Sample Requests': '50', 'Q3-Sep-Purchases': '25', 'Q3-Sep-MTU': '150',
+                'Q4-Oct-Downloads': '800', 'Q4-Oct-Sample Requests': '50', 'Q4-Oct-Purchases': '30', 'Q4-Oct-MTU': '160',
+                'Q4-Nov-Downloads': '1000', 'Q4-Nov-Sample Requests': '60', 'Q4-Nov-Purchases': '40', 'Q4-Nov-MTU': '180',
+                'Q4-Dec-Downloads': '1200', 'Q4-Dec-Sample Requests': '70', 'Q4-Dec-Purchases': '50', 'Q4-Dec-MTU': '200'
+            };
+
+            let html = '';
+            for (const qtr of quarters) {
+                html += `<h3>${qtr.name}</h3><table><tr><th>Metric</th>`;
+                qtr.months.forEach(m => {
+                    html += `<th>${m} Target</th><th>${m} Actual</th>`;
+                });
+                html += '</tr>';
+
+                for (const metric of metricNames) {
+                    html += `<tr><td><strong>${metric}</strong></td>`;
+                    for (const month of qtr.months) {
+                        const key = `${qtr.id}-${month}-${metric}`;
+                        const data = metricsCache[key] || {};
+                        const target = data.target || defaultTargets[key] || '-';
+                        const actual = data.actual || '-';
+                        html += `<td>${target}</td><td class="editable" onclick="makeEditable(this,'${qtr.id}','${month}','${metric}')">${actual}</td>`;
+                    }
+                    html += '</tr>';
+                }
+                html += '</table>';
+            }
+
+            document.getElementById('metricsContainer').innerHTML = html;
+        }
+
+        // Export to CSV
+        function exportData() {
+            let csv = 'Quarter,Month,Metric,Target,Actual\n';
+            for (const [key, data] of Object.entries(metricsCache)) {
+                csv += `${data.quarter},${data.month},${data.metric_name},${data.target},${data.actual || ''}\n`;
+            }
+            const blob = new Blob([csv], {type: 'text/csv'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '2026-metrics.csv';
+            a.click();
+        }
+
+        // Poll for updates every 10 seconds
+        setInterval(async () => {
+            await loadMetrics();
+            await loadTextFields();
+            await loadCustomTasks();
+            if (document.getElementById('metrics').classList.contains('active')) {
+                renderMetrics();
+            }
+        }, 10000);
+
+        // Initialize on page load
+        (async () => {
+            await initMetrics();
+            await loadMetrics();
+            await loadTextFields();
+            await loadCustomTasks();
+        })();
+    </script>
+</body>
+</html>
