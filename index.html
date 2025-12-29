@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025 Annual Planning System</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            margin: 0 0 10px 0;
+        }
+        .header p {
+            margin: 5px 0;
+            opacity: 0.9;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .tab {
+            padding: 12px 24px;
+            background: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+        .content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: none;
+        }
+        .content.active {
+            display: block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        tr:hover {
+            background: #f8f9ff;
+        }
+        .section {
+            margin: 30px 0;
+        }
+        .section h3 {
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .metric-card {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 10px;
+            min-width: 200px;
+        }
+        .metric-card h4 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .metric-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status.not-started { background: #e0e0e0; color: #666; }
+        .status.in-progress { background: #fff3cd; color: #856404; }
+        .status.done { background: #d4edda; color: #155724; }
+        .status.blocked { background: #f8d7da; color: #721c24; }
+        .priority {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .priority.p0 { background: #dc3545; color: white; }
+        .priority.p1 { background: #fd7e14; color: white; }
+        .priority.p2 { background: #ffc107; color: #333; }
+        .priority.p3 { background: #28a745; color: white; }
+        .note {
+            background: #fff9e6;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .instructions {
+            background: #e8eaf6;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .instructions h4 {
+            margin-top: 0;
+            color: #667eea;
+        }
+        .quarter-card {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚀 2025 Annual Planning & Tracking System</h1>
+        <p><strong>Company:</strong> Makeup Matching App (Preseed Stage)</p>
+        <p><strong>Team:</strong> 5 people | <strong>Capacity:</strong> 25-50 hours/week | <strong>Status:</strong> Pre-revenue, App Store launch pending</p>
+        <p><strong>Mission:</strong> Help all people, especially WOC, find their perfect makeup matches through CV technology + support indie brands</p>
+    </div>
+
+    <div class="tabs">
+        <button class="tab active" onclick="showTab('annual')">📅 Annual Overview</button>
+        <button class="tab" onclick="showTab('q1')">Q1 Plan</button>
+        <button class="tab" onclick="showTab('q2')">Q2 Plan</button>
+        <button class="tab" onclick="showTab('q3')">Q3 Plan</button>
+        <button class="tab" onclick="showTab('q4')">Q4 Plan</button>
+        <button class="tab" onclick="showTab('tasks')">✅ Weekly Tasks</button>
+        <button class="tab" onclick="showTab('metrics')">📊 Metrics Dashboard</button>
+        <button class="tab" onclick="showTab('meetings')">📝 Meeting Notes</button>
+    </div>
+
+    <!-- ANNUAL OVERVIEW TAB -->
+    <div id="annual" class="content active">
+        <div class="instructions">
+            <h4>💡 How to Use This Sheet</h4>
+            <p><strong>Weekly:</strong> Review "Weekly Tasks" tab every Monday. Update task status. Assign new micro-tasks.<br>
+            <strong>Monthly:</strong> Update "Metrics Dashboard" with actual numbers. Review quarterly plan progress.<br>
+            <strong>Quarterly:</strong> Deep dive into next quarter's plan. Adjust based on learnings.</p>
+        </div>
+
+        <div class="section">
+            <h3>🎯 2025 North Star Goals</h3>
+            <div class="metric-card">
+                <h4>Total Users</h4>
+                <p class="value">3,000</p>
+            </div>
+            <div class="metric-card">
+                <h4>Brand Partnerships</h4>
+                <p class="value">2-3</p>
+            </div>
+            <div class="metric-card">
+                <h4>Monthly Transacting Users</h4>
+                <p class="value">100</p>
+            </div>
+            <div class="metric-card">
+                <h4>Affiliate Revenue</h4>
+                <p class="value">$10K+</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>📈 Quarterly Milestones</h3>
+            <table>
+                <tr>
+                    <th>Quarter</th>
+                    <th>Phase</th>
+                    <th>Primary Goal</th>
+                    <th>Key Deliverables</th>
+                    <th>Success Metrics</th>
+                </tr>
+                <tr>
+                    <td><strong>Q1</strong><br>Jan-Mar</td>
+                    <td>Validation</td>
+                    <td>Validate product-market fit with early adopters</td>
+                    <td>• App Store launch<br>• Bug fixes based on real usage<br>• Content marketing system<br>• Dupe detector MVP</td>
+                    <td>• 500 downloads<br>• 60 sample requests<br>• 20 purchases<br>• 4.5+ star rating</td>
+                </tr>
+                <tr>
+                    <td><strong>Q2</strong><br>Apr-Jun</td>
+                    <td>Optimization</td>
+                    <td>Improve conversion funnel + add retention hooks</td>
+                    <td>• Expand dupe detector (200+ products)<br>• Brand analytics dashboard<br>• Hire 2 interns<br>• 3-5 micro-influencer partnerships</td>
+                    <td>• 1,000 total downloads<br>• 30% match-to-purchase rate<br>• 50 MTU<br>• First brand partner signed</td>
+                </tr>
+                <tr>
+                    <td><strong>Q3</strong><br>Jul-Sep</td>
+                    <td>Growth</td>
+                    <td>Scale acquisition + secure brand partnerships</td>
+                    <td>• User reviews/ratings feature<br>• Wishlist/save functionality<br>• 2nd brand partnership<br>• Increase paid marketing to $500/mo</td>
+                    <td>• 2,000 total users<br>• 2 brand partners<br>• 75 MTU<br>• 20% 90-day retention</td>
+                </tr>
+                <tr>
+                    <td><strong>Q4</strong><br>Oct-Dec</td>
+                    <td>Monetization</td>
+                    <td>Prove revenue model + prepare for fundraise</td>
+                    <td>• 3rd brand partnership<br>• Investor deck finalized<br>• Push notifications optimized<br>• Begin angel conversations</td>
+                    <td>• 3,000 total users<br>• 3 brand partners<br>• 100 MTU<br>• $10K+ revenue<br>• Fundraise prep complete</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h3>👥 Hiring Plan</h3>
+            <table>
+                <tr>
+                    <th>Timeline</th>
+                    <th>Role</th>
+                    <th>Hours/Week</th>
+                    <th>Primary Responsibilities</th>
+                </tr>
+                <tr>
+                    <td>Q2 (Apr start)</td>
+                    <td>Marketing/Content Intern</td>
+                    <td>10-15</td>
+                    <td>Create 3 posts/week, influencer outreach, community engagement, social media management</td>
+                </tr>
+                <tr>
+                    <td>Q2 (Apr start)</td>
+                    <td>QA/Community Intern</td>
+                    <td>10</td>
+                    <td>Test features, document bugs, user support, organize feedback</td>
+                </tr>
+                <tr>
+                    <td>Q3 (if found)</td>
+                    <td>Data/Research Intern</td>
+                    <td>8-10</td>
+                    <td>Build dupe database, analyze PostHog data, research indie brands</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h3>💰 Budget Allocation</h3>
+            <table>
+                <tr>
+                    <th>Category</th>
+                    <th>Q1</th>
+                    <th>Q2</th>
+                    <th>Q3</th>
+                    <th>Q4</th>
+                    <th>Total</th>
+                </tr>
+                <tr>
+                    <td>Paid Marketing</td>
+                    <td>$900</td>
+                    <td>$900</td>
+                    <td>$1,500</td>
+                    <td>$1,500</td>
+                    <td>$4,800</td>
+                </tr>
+                <tr>
+                    <td>Sample Fulfillment (20/mo)</td>
+                    <td>$360</td>
+                    <td>$360</td>
+                    <td>$360</td>
+                    <td>$360</td>
+                    <td>$1,440</td>
+                </tr>
+                <tr>
+                    <td>Tools (PostHog, hosting, etc.)</td>
+                    <td>$300</td>
+                    <td>$300</td>
+                    <td>$400</td>
+                    <td>$400</td>
+                    <td>$1,400</td>
+                </tr>
+                <tr>
+                    <td><strong>Total</strong></td>
+                    <td><strong>$1,560</strong></td>
+                    <td><strong>$1,560</strong></td>
+                    <td><strong>$2,260</strong></td>
+                    <td><strong>$2,260</strong></td>
+                    <td><strong>$7,640</strong></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Q1 PLAN TAB -->
+    <div id="q1" class="content">
+        <h2>Q1 2025: Validation Phase (Jan-Mar)</h2>
+        
+        <div class="quarter-card">
+            <h3>🎯 Quarter Goal</h3>
+            <p><strong>Validate product-market fit with early adopters</strong></p>
+            <p><strong>Success Metrics:</strong> 500 downloads | 60 sample requests | 20 purchases | 4.5+ star rating</p>
+        </div>
+
+        <div class="section">
+            <h3>January: Launch + Learn</h3>
+            <table>
+                <tr>
+                    <th style="width: 15%">Week</th>
+                    <th style="width: 20%">Focus Area</th>
+                    <th style="width: 35%">Key Deliverables</th>
+                    <th style="width: 15%">Owner</th>
+                    <th style="width: 15%">Status</th>
+                </tr>
+                <tr>
+                    <td>Week 1<br>Jan 1-5</td>
+                    <td>🚀 Launch</td>
+                    <td>• App Store submission complete<br>• PostHog tracking implemented<br>• Monitor for P0 bugs only<br>• First social posts go live</td>
+                    <td>Justin, You</td>
+                    <td><span class="status not-started">Not Started</span></td>
+                </tr>
+                <tr>
+                    <td>Week 2<br>Jan 6-12</td>
+                    <td>🐛 Stabilize</td>
+                    <td>• Fix any P0 bugs<br>• Set up PostHog funnels<br>• Content: 3 TikToks/Reels<br>• Start influencer list (10 names)</td>
+                    <td>Jeff, You</td>
+                    <td><span class="status not-started">Not Started</span></td>
+                </tr>
+                <tr>
+                    <td>Week 3<br>Jan 13-19</td>
+                    <td>📊 Monitor</td>
+                    <td>• Analyze first week of data<br>• Identify top drop-off points<br>• Fix P1 bugs<br>• Content: 3 posts + first influencer outreach (5 people)</td>
+                    <td>Garima, All</td>
+                    <td><span class="status not-started">Not Started</span></td>
+                </tr>
+                <tr>
+                    <td>Week 4<br>Jan 20-26</td>
+                    <td>🎯 Optimize</td>
+                    <td>• Continue P1 bug fixes<br>• Content: 3 posts<br>• Follow up with influencers<br>• Review month 1 metrics</td>
+                    <td>All</td>
+                    <td><span class="status not-started">Not Started</span></td>
+                </tr>
+            </table>
+            <p><strong>January Target:</strong> 150 downloads | 15 sample requests | 5 purchases</p>
+        </div>
+
+        <div class="section">
+            <h3>February: Optimize Core Flow</h3>
+            <table>
+                <tr>
+                    <th style="width: 15%">Week</th>
+                    <th style="width: 20%">Focus Area</th>
+                    <th style="width: 35%">Key Deliverables</th>
+                    <th style="width: 15%">Owner</th>
+                    <th style="width: 15%">Status</th>
+                </tr>
+                <tr>
+                    <td>Week 5<br>Jan 27-Feb 2</td>
+                    <td>🔧 Features</td>
+                    <td>• Improve sample request flow<br>• Design push notification system<br>• Content: 3 posts<br>• Sign first micro-influencer</td>
+                    <td>Jeff, You</td>
+                    <td><span class="status not-started">Not Started</span></td>
+                </tr>
+                <tr>
+                    <td>Week 6<br>Feb 3-9</td>
+                    <td>📲 Notifications</td>
+                    <td>• Ship basic push notifications<br>• Start dupe detector research (list 50 discontinued products)<br>• Content: 3 posts</td>
+                    <td>Justin, Wayne</td>
+                    <td><span class="status not-started">Not Started</span></td>
+                </tr>
+                <tr>
+                    <td>Week 7<br>Feb 10-16</td>
+                    <td>🔍 Research</td>
+                    <td>• Continue dupe database building<br>• Analyze conversion funnel improvements<br>• Content: 3 posts<br>• Sign second influencer</td>
+                    <td>Wayne, Garima</td>
+                    <td><span class="status not-started">Not Started</span></td>
+                </tr>
+                <tr>
+                    <td>Week 8<br>Feb 17-23</td>
+                    <td>📈 Review</td>
+                    <td>• Month 2 metrics review<br>• Plan March priorities<br>• Content: 3 posts<br>• Paid ads analysis</td>
+                    <td>All</td>
+                    <td><span class="status not-started">Not Started</span></td>
+                </tr>
+            </table>
+            <p><strong>February Target:</strong> 200 downloads | 25 sample requests | 8 purchases</p>
+        </div>
+
+        <div class="section">
+            <h3>March: Add Retention Hook #1</h3>
+            <table>
+                <tr>
+                    <th style="width: 15%">Week</th>
+                    <th style="width: 20%">Focus Area</th>
+                    <th style="width: 35%">Key Deliverables</th>
+                    <th style="width: 15%">Owner</th>
+                    <th style="width: 15%">Status</th>
+                </tr>
+                <tr>
+                    <td>Week 9<br>Feb 24-Mar 2</td>
+                    <td>🎨 Dupe Detector</td>
+                    <td>• Build dupe detector UI<br>• Integrate 50-product database<br>• Content: 3 posts<br>• Start intern job descriptions</td>
+                    <td>Jeff, You</td>
+                    <td><span class="status not-started">Not Started</span></td>
+                </tr>
+                <tr>
+                    <td>Week 10<br>Mar 3-9</td>
+                    <td>🚢 Ship Dupe</td>
+                    <td>• Launch dupe detector MVP<br>• Test thoroughly<br>• Create PR angle for dupe feature<br>• Content: Dupe-focused posts</td>
+                    <td>All</td>
+                    <td><span class="status not-started">Not Started</span></td>
+                </tr>
+                <tr>
+                    <td>Week 11<br>Mar 10-16</td>
+                    <td>📝 Wishlist</td>
+                    <td>• Add "Save for later" feature<br>• Post intern jobs (Handshake, LinkedIn)<br>• Content: 3 posts promoting dupe feature<br>• PR outreach for dupe detector</td>
+                    <td>Jeff, You</td>
+                    <td><span class="status not-started">Not Started</span></td>
+                </tr>
+                <tr>
+                    <td>Week 12<br>Mar 17-23</td>
+                    <td>👥 Hiring</td>
+                    <td>• Interview intern candidates<br>• Q1 retrospective<br>• Plan Q2 priorities<br>• Content: 3 posts</td>
+                    <td>You, Garima</td>
+                    <td><span class="status not-started">Not Started</span></td>
+                </tr>
+            </table>
+            <p><strong>March Target:</strong> 150 downloads | 20 sample requests | 7 purchases</p>
+        </div>
+
+        <div class="note">
+            <strong>Q1 Engineering Time Allocation:</strong><br>
+            • January: 100% bug fixes and monitoring<br>
+            • February: 60% optimization, 40% dupe detector prep<br>
+            • March: 70% dupe detector + wishlist, 30% maintenance
+        </div>
+    </div>
+
+    <!-- Q2 PLAN TAB -->
+    <div id="q2" class="content">
+        <h2>Q2 2025: Optimization Phase (Apr-Jun)</h2>
+        
+        <div class="quarter-card">
+            <h3>🎯 Quarter Goal</h3>
+            <p><strong>Improve conversion funnel + add retention hooks</strong></p>
+            <p><strong>Success Metrics:</strong> 1,000 total downloads | 30% match-to-purchase rate | 50 MTU | First brand partner</p>
+        </div>
+
+        <div class="section">
+            <h3>Key Deliverables</h3>
+            <ul>
+                <li>Expand dupe detector to 200+ products</li>
+                <li>Build brand analytics dashboard (MVP)</li>
+                <li>Onboard 2 interns (Marketing + QA)</li>
+                <li>Secure 3-5 micro-influencer partnerships</li>
+                <li>Add user reviews/ratings feature</li>
+                <li>Sign first brand partnership</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>Monthly Breakdown</h3>
+            <table>
+                <tr>
+                    <th>Month</th>
+                    <th>Focus</th>
+                    <th>Key Milestones</th>
+                    <th>Target Metrics</th>
+                </tr>
+                <tr>
+                    <td><strong>April</strong></td>
+                    <td>Intern onboarding + Dupe expansion</td>
+                    <td>• Onboard 2 interns<br>• Expand dupe DB to 100 products<br>• Start brand dashboard design</td>
+                    <td>300 downloads<br>80 MTU<br>25% conversion</td>
+                </tr>
+                <tr>
+                    <td><strong>May</strong></td>
+                    <td>Brand tools + partnerships</td>
+                    <td>• Complete dupe DB (200 products)<br>• Ship brand analytics dashboard<br>• Outreach to 10 micro brands</td>
+                    <td>350 downloads<br>90 MTU<br>28% conversion</td>
+                </tr>
+                <tr>
+                    <td><strong>June</strong></td>
+                    <td>Close first partnership</td>
+                    <td>• Sign first brand partner<br>• Add reviews/ratings<br>• Q2 retrospective</td>
+                    <td>350 downloads<br>100 MTU<br>30% conversion</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="note">
+            <strong>Q2 Engineering Focus:</strong> 50% brand tools | 30% expanding dupe DB | 20% maintenance
+        </div>
+    </div>
+
+    <!-- Q3 PLAN TAB -->
+    <div id="q3" class="content">
+        <h2>Q3 2025: Growth Phase (Jul-Sep)</h2>
+        
+        <div class="quarter-card">
+            <h3>🎯 Quarter Goal</h3>
+            <p><strong>Scale acquisition + secure brand partnerships</strong></p>
+            <p><strong>Success Metrics:</strong> 2,000 total users | 2 brand partners | 75 MTU | 20% 90-day retention</p>
+        </div>
+
+        <div class="section">
+            <h3>Key Deliverables</h3>
+            <ul>
+                <li>User reviews and ratings system</li>
+                <li>Wishlist/save functionality enhancements</li>
+                <li>Sign 2nd brand partnership</li>
+                <li>Increase paid marketing budget to $500/month</li>
+                <li>Consider hiring Data/Research intern</li>
+                <li>Optimize push notification strategy</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>Monthly Breakdown</h3>
+            <table>
+                <tr>
+                    <th>Month</th>
+                    <th>Focus</th>
+                    <th>Key Milestones</th>
+                    <th>Target Metrics</th>
+                </tr>
+                <tr>
+                    <td><strong>July</strong></td>
+                    <td>Reviews + Ratings</td>
+                    <td>• Ship reviews/ratings feature<br>• Scale paid ads to $500/mo<br>• Partner with 3 more influencers</td>
+                    <td>600 downloads<br>120 MTU<br>15% retention</td>
+                </tr>
+                <tr>
+                    <td><strong>August</strong></td>
+                    <td>Partnership #2</td>
+                    <td>• Close 2nd brand partnership<br>• Optimize notification timing<br>• Hire Data intern (if found)</td>
+                    <td>700 downloads<br>130 MTU<br>18% retention</td>
+                </tr>
+                <tr>
+                    <td><strong>September</strong></td>
+                    <td>Retention optimization</td>
+                    <td>• Improve 90-day retention to 20%<br>• Q3 retrospective<br>• Begin Q4 fundraise prep</td>
+                    <td>700 downloads<br>150 MTU<br>20% retention</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Q4 PLAN TAB -->
+    <div id="q4" class="content">
+        <h2>Q4 2025: Monetization Phase (Oct-Dec)</h2>
+        
+        <div class="quarter-card">
+            <h3>🎯 Quarter Goal</h3>
+            <p><strong>Prove revenue model + prepare for fundraise</strong></p>
+            <p><strong>Success Metrics:</strong> 3,000 total users | 3 brand partners | 100 MTU | $10K+ revenue | Fundraise ready</p>
+        </div>
+
+        <div class="section">
+            <h3>Key Deliverables</h3>
+            <ul>
+                <li>Sign 3rd brand partnership</li>
+                <li>Finalize investor deck</li>
+                <li>Begin warm angel investor conversations</li>
+                <li>Optimize all conversion funnels</li>
+                <li>Hit $10K+ annual revenue run rate</li>
+                <li>Document case studies from brand partners</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>Monthly Breakdown</h3>
+            <table>
+                <tr>
+                    <th>Month</th>
+                    <th>Focus</th>
+                    <th>Key Milestones</th>
+                    <th>Target Metrics</th>
+                </tr>
+                <tr>
+                    <td><strong>October</strong></td>
+                    <td>Partnership #3</td>
+                    <td>• Sign 3rd brand partner<br>• Create investor deck v1<br>• Document success stories</td>
+                    <td>800 downloads<br>160 MTU<br>$3K revenue</td>
+                </tr>
+                <tr>
+                    <td><strong>November</strong></td>
+                    <td>Fundraise prep</td>
+                    <td>• Share deck with 5 friendly angels for feedback<br>• Refine pitch<br>• Build investor target list (30-50 names)</td>
+                    <td>1,000 downloads<br>180 MTU<br>$4K revenue</td>
+                </tr>
+                <tr>
+                    <td><strong>December</strong></td>
+                    <td>Year-end push</td>
+                    <td>• Hit $10K revenue milestone<br>• Annual retrospective<br>• Plan 2026 roadmap<br>• Begin active fundraising in Q1 2026</td>
+                    <td>1,200 downloads<br>200 MTU<br>$3K+ revenue</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- WEEKLY TASKS TAB -->
+    <div id="tasks" class="content">
+        <h2>✅ Weekly Task Tracker</h2>
+        
+        <div class="instructions">
+            <h4>How to Use This Tracker</h4>
+            <p><strong>Monday Morning:</strong> Review last week's tasks. Add new tasks for current week. Assign owners.<br>
+            <strong>Throughout Week:</strong> Update status as work progresses.<br>
+            <strong>Friday:</strong> Mark completed tasks as DONE. Move blocked/incomplete tasks to next week.</p>
+        </div>
+
+        <div class="section">
+            <h3>Current Week Tasks</h3>
+            <table>
+                <tr>
+                    <th style="width: 5%">#</th>
+                    <th style="width: 15%">Area</th>
+                    <th style="width: 35%">Task</th>
+                    <th style="width: 12%">Owner</th>
+                    <th style="width: 10%">Priority</th>
+                    <th style="width: 8%">Hours</th>
+                    <th style="width: 15%">Status</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Engineering</td>
+                    <td>Fix P0 bug: App crashes on iPhone 15 when taking photo</td>
+                    <td>Justin</td>
+                    <td><span class="priority p0">P0</span></td>
+                    <td>8</td>
+                    <td><span class="status in-progress">In Progress</span></td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Marketing</td>
+                    <td>Create 3 TikTok videos (dupe theme) - batch filming Sunday</td>
+                    <td>You</td>
+                    <td><span class="priority p1">P1</span></td>
+                    <td>2</td>
+                    <td><span class="status not-started">Not Started</span></td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Marketing</td>
+                    <td>Outreach to 5 micro-influencers with partnership pitch</td>
+                    <td>You</td>
+                    <td><span class="priority p1">P1</span></td>
+                    <td>1.5</td>
+                    <td><span class="status not-started">Not Started</span></td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Product</td>
+                    <td>Review PostHog funnel data from last week - identify drop-offs</td>
+                    <td>Garima</td>
+                    <td><span class="priority p1">P1</span></td>
+                    <td>2</td>
+                    <td><span class="status not-started">Not Started</span></td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Engineering</td>
+                    <td>Research discontinued products for dupe database (add 10 products)</td>
+                    <td>Wayne</td>
+                    <td><span class="priority p2">P2</span></td>
+                    <td>3</td>
+                    <td><span class="status not-started">Not Started</span></td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>Engineering</td>
+                    <td>Ship sample request flow improvements (simplify form)</td>
+                    <td>Jeff</td>
+                    <td><span class="priority p1">P1</span></td>
+                    <td>6</td>
+                    <td><span class="status not-started">Not Started</span></td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>Operations</td>
+                    <td>Fulfill and ship 5 sample requests from last week</td>
+                    <td>You</td>
+                    <td><span class="priority p1">P1</span></td>
+                    <td>1</td>
+                    <td><span class="status not-started">Not Started</span></td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>Marketing</td>
+                    <td>Respond to app store reviews and social media comments</td>
+                    <td>You</td>
+                    <td><span class="priority p2">P2</span></td>
+                    <td>0.5</td>
+                    <td><span class="status not-started">Not Started</span></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="note">
+            <strong>Template for Adding New Tasks:</strong><br>
+            In Google Sheets, copy this format: [Task #] | [Area: Engineering/Marketing/Product/Operations] | [Task Description] | [Owner Name] | [Priority: P0/P1/P2/P3] | [Estimated Hours] | [Status: Not Started/In Progress/Done/Blocked]
+        </div>
+
+        <div class="section">
+            <h3>Completed This Week</h3>
+            <table>
+                <tr>
+                    <th style="width: 5%">#</th>
+                    <th style="width: 15%">Area</th>
+                    <th style="width: 45%">Task</th>
+                    <th style="width: 12%">Owner</th>
+                    <th style="width: 23%">Completed Date</th>
+                </tr>
+                <tr>
+                    <td colspan="5" style="text-align: center; color: #999;">No completed tasks yet this week</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h3>Blocked/Carry Over</h3>
+            <table>
+                <tr>
+                    <th style="width: 5%">#</th>
+                    <th style="width: 15%">Area</th>
+                    <th style="width: 30%">Task</th>
+                    <th style="width: 12%">Owner</th>
+                    <th style="width: 38%">Blocker/Reason</th>
+                </tr>
+                <tr>
+                    <td colspan="5" style="text-align: center; color: #999;">No blocked tasks</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- METRICS DASHBOARD TAB -->
+    <div id="metrics" class="content">
+        <h2>📊 Metrics Dashboard</h2>
+        
+        <div class="instructions">
+            <h4>Update Schedule</h4>
+            <p><strong>Weekly:</strong> Update current week actuals from PostHog<br>
+            <strong>Monthly:</strong> Review against targets, analyze trends, adjust strategy if needed</p>
+        </div>
+
+        <div class="section">
+            <h3>North Star Metrics (Live Tracking)</h3>
+            <div class="metric-card">
+                <h4>Total Downloads</h4>
+                <p class="value">0</p>
+                <small>Target: 500 (Q1)</small>
+            </div>
+            <div class="metric-card">
+                <h4>Monthly Transacting Users</h4>
+                <p class="value">0</p>
+                <small>Target: 20 (Q1)</small>
+            </div>
+            <div class="metric-card">
+                <h4>Sample Requests</h4>
+                <p class="value">0</p>
+                <small>Target: 60 (Q1)</small>
+            </div>
+            <div class="metric-card">
+                <h4>Total Purchases</h4>
+                <p class="value">0</p>
+                <small>Target: 20 (Q1)</small>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Monthly Tracking - Q1 2025</h3>
+            <table>
+                <tr>
+                    <th>Metric</th>
+                    <th>Jan Target</th>
+                    <th>Jan Actual</th>
+                    <th>Feb Target</th>
+                    <th>Feb Actual</th>
+                    <th>Mar Target</th>
+                    <th>Mar Actual</th>
+                    <th>Q1 Total</th>
+                </tr>
+                <tr>
+                    <td><strong>Downloads</strong></td>
+                    <td>150</td>
+                    <td>-</td>
+                    <td>200</td>
+                    <td>-</td>
+                    <td>150</td>
+                    <td>-</td>
+                    <td>-/500</td>
+                </tr>
+                <tr>
+                    <td><strong>Sample Requests</strong></td>
+                    <td>15</td>
+                    <td>-</td>
+                    <td>25</td>
+                    <td>-</td>
+                    <td>20</td>
+                    <td>-</td>
+                    <td>-/60</td>
+                </tr>
+                <tr>
+                    <td><strong>Purchases</strong></td>
+                    <td>5</td>
+                    <td>-</td>
+                    <td>8</td>
+                    <td>-</td>
+                    <td>7</td>
+                    <td>-</td>
+                    <td>-/20</td>
+                </tr>
+                <tr>
+                    <td><strong>Match-to-Purchase %</strong></td>
+                    <td>5-10%</td>
+                    <td>-</td>
+                    <td>10-12%</td>
+                    <td>-</td>
+                    <td>12-15%</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td><strong>Sample Request Rate</strong></td>
+                    <td>50%</td>
+                    <td>-</td>
+                    <td>55%</td>
+                    <td>-</td>
+                    <td>60%</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td><strong>App Store Rating</strong></td>
+                    <td>4.0+</td>
+                    <td>-</td>
+                    <td>4.3+</td>
+                    <td>-</td>
+                    <td>4.5+</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td><strong>Session Completion %</strong></td>
+                    <td>60%</td>
+                    <td>-</td>
+                    <td>65%</td>
+                    <td>-</td>
+                    <td>70%</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h3>Conversion Funnel (From PostHog)</h3>
+            <table>
+                <tr>
+                    <th>Funnel Step</th>
+                    <th>Users</th>
+                    <th>% of Previous</th>
+                    <th>Notes</th>
+                </tr>
+                <tr>
+                    <td>1. App Opens</td>
+                    <td>-</td>
+                    <td>100%</td>
+                    <td>Update weekly</td>
+                </tr>
+                <tr>
+                    <td>2. Photo Taken</td>
+                    <td>-</td>
+                    <td>-%</td>
+                    <td>Target: 80%+</td>
+                </tr>
+                <tr>
+                    <td>3. Match Received</td>
+                    <td>-</td>
+                    <td>-%</td>
+                    <td>Target: 90%+ (of photos)</td>
+                </tr>
+                <tr>
+                    <td>4. Sample Requested</td>
+                    <td>-</td>
+                    <td>-%</td>
+                    <td>Target: 60%+ (of matches)</td>
+                </tr>
+                <tr>
+                    <td>5. Purchase Made</td>
+                    <td>-</td>
+                    <td>-%</td>
+                    <td>Target: 15%+ (of matches)</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h3>Marketing Performance</h3>
+            <table>
+                <tr>
+                    <th>Channel</th>
+                    <th>Spend</th>
+                    <th>Downloads</th>
+                    <th>Cost Per Download</th>
+                    <th>Purchases</th>
+                    <th>ROI</th>
+                </tr>
+                <tr>
+                    <td>TikTok Ads</td>
+                    <td>$-</td>
+                    <td>-</td>
+                    <td>$-</td>
+                    <td>-</td>
+                    <td>-%</td>
+                </tr>
+                <tr>
+                    <td>Meta Ads</td>
+                    <td>$-</td>
+                    <td>-</td>
+                    <td>$-</td>
+                    <td>-</td>
+                    <td>-%</td>
+                </tr>
+                <tr>
+                    <td>Google Ads</td>
+                    <td>$-</td>
+                    <td>-</td>
+                    <td>$-</td>
+                    <td>-</td>
+                    <td>-%</td>
+                </tr>
+                <tr>
+                    <td>Organic Social</td>
+                    <td>$0</td>
+                    <td>-</td>
+                    <td>$0</td>
+                    <td>-</td>
+                    <td>-%</td>
+                </tr>
+                <tr>
+                    <td>Influencers</td>
+                    <td>$-</td>
+                    <td>-</td>
+                    <td>$-</td>
+                    <td>-</td>
+                    <td>-%</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- MEETING NOTES TAB -->
+    <div id="meetings" class="content">
+        <h2>📝 Meeting Notes & Decisions</h2>
+        
+        <div class="instructions">
+            <h4>Meeting Cadence</h4>
+            <p><strong>Monday (30 min):</strong> Review metrics, prioritize week, assign tasks<br>
+            <strong>Friday (1 hour):</strong> Demo completed work, retrospective, celebrate wins</p>
+        </div>
+
+        <div class="section">
+            <h3>Template: Weekly Monday Sync</h3>
+            <div style="background: #f8f9ff; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                <p><strong>Date:</strong> [MM/DD/YYYY]</p>
+                <p><strong>Attendees:</strong> [Names]</p>
+                <p><strong>Last Week Wins:</strong></p>
+                <ul>
+                    <li>[What shipped?]</li>
+                    <li>[What metrics moved?]</li>
+                </ul>
+                <p><strong>Key Metrics Update:</strong></p>
+                <ul>
+                    <li>Downloads this week: [#]</li>
+                    <li>Sample requests: [#]</li>
+                    <li>Purchases: [#]</li>
+                    <li>Top drop-off point: [Screen/step]</li>
+                </ul>
+                <p><strong>This Week Priorities:</strong></p>
+                <ol>
+                    <li>[Priority 1 with owner]</li>
+                    <li>[Priority 2 with owner]</li>
+                    <li>[Priority 3 with owner]</li>
+                </ol>
+                <p><strong>Blockers/Concerns:</strong></p>
+                <ul>
+                    <li>[What's blocking progress?]</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Template: Weekly Friday Demo</h3>
+            <div style="background: #f8f9ff; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                <p><strong>Date:</strong> [MM/DD/YYYY]</p>
+                <p><strong>Attendees:</strong> [Names]</p>
+                <p><strong>What Shipped This Week:</strong></p>
+                <ul>
+                    <li>[Feature/fix with demo]</li>
+                </ul>
+                <p><strong>Learnings:</strong></p>
+                <ul>
+                    <li>[What did we learn from data?]</li>
+                    <li>[What surprised us?]</li>
+                </ul>
+                <p><strong>Retrospective:</strong></p>
+                <ul>
+                    <li>What went well: [...]</li>
+                    <li>What to improve: [...]</li>
+                    <li>Action items: [...]</li>
+                </ul>
+                <p><strong>Celebrate:</strong></p>
+                <ul>
+                    <li>[Wins, big and small!]</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Recent Meeting Notes</h3>
+            <table>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Key Decisions</th>
+                    <th>Action Items</th>
+                </tr>
+                <tr>
+                    <td colspan="4" style="text-align: center; color: #999;">No meetings logged yet</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.content');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+    </script>
+</body>
+</html>
+                
