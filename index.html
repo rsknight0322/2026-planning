@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 Annual Planning System</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fafafa;
+        }
+        .header {
+            background: #A38679;
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        .header h1 { margin: 0 0 10px 0; }
+        .header p { margin: 5px 0; opacity: 0.95; }
+        .sync-status {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .tab {
+            padding: 12px 24px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            transition: all 0.2s;
+            color: #56493D;
+        }
+        .tab:hover {
+            border-color: #C6A587;
+            background: #fefefe;
+        }
+        .tab.active {
+            background: #A38679;
+            color: white;
+            border-color: #A38679;
+        }
+        .content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            display: none;
+        }
+        .content.active {
+            display: block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th {
+            background: #C6A587;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 500;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        tr:hover { background: #fafafa; }
+        .section {
+            margin: 30px 0;
+        }
+        .section h3 {
+            color: #A38679;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        .metric-card {
+            display: inline-block;
+            background: #A38679;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 10px;
+            min-width: 200px;
+        }
+        .metric-card h4 {
+            margin: 0 0 10px 0;
+            font-size: 13px;
+            opacity: 0.9;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .metric-card .value {
+            font-size: 32px;
+            font-weight: 600;
+            margin: 0;
+        }
+        .note {
+            background: #fef9f5;
+            border-left: 3px solid #C6A587;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .instructions {
+            background: #fef9f5;
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        .instructions h4 {
+            margin-top: 0;
+            color: #A38679;
+            font-weight: 500;
+        }
+        .quarter-card {
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border-left: 3px solid #C6A587;
+        }
+        .week-block {
+            background: #fafafa;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 6px;
+            border-left: 3px solid #C6A587;
+        }
+        .week-block h4 {
+            margin: 0 0 10px 0;
+            color: #A38679;
+            font-weight: 500;
+        }
+        .editable {
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+            min-height: 20px;
+            display: inline-block;
+            min-width: 40px;
+        }
+        .editable:hover {
+            background: #fef9f5;
+            outline: 1px solid #C6A587;
+        }
+        .export-btn {
+            background: #A38679;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            margin: 20px 0;
+            transition: background 0.2s;
+        }
+        .export-btn:hover {
+            background: #56493D;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="sync-status">🟢 Live Sync Active</div>
+        <h1>🚀 2026 Annual Planning & Tracking System</h1>
+        <p><strong>Company:</strong> Makeup Matching App (Preseed Stage)</p>
+        <p><strong>Team:</strong> 5 people | <strong>Capacity:</strong> 25-50 hours/week</p>
+        <p><strong>Mission:</strong> Help WOC find perfect makeup matches + support indie brands</p>
+        <p style="font-size: 12px; opacity: 0.8; margin-top: 10px;">💡 Click any "Actual" value in Metrics Dashboard to edit. Changes sync in real-time!</p>
+    </div>
+
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('annual')">📅 Annual Overview</button>
+        <button class="tab" onclick="switchTab('q1')">Q1 Plan</button>
+        <button class="tab" onclick="switchTab('q2')">Q2 Plan</button>
+        <button class="tab" onclick="switchTab('q3')">Q3 Plan</button>
+        <button class="tab" onclick="switchTab('q4')">Q4 Plan</button>
+        <button class="tab" onclick="switchTab('tasks')">✅ Weekly Tasks</button>
+        <button class="tab" onclick="switchTab('metrics')">📊 Metrics Dashboard</button>
+    </div>
+
+    <div id="annual" class="content active">
+        <div class="instructions">
+            <h4>💡 How to Use This System</h4>
+            <p><strong>Weekly:</strong> Review Weekly Tasks tab every Wednesday<br>
+            <strong>Monthly:</strong> Update Metrics Dashboard with actual numbers<br>
+            <strong>Quarterly:</strong> Review progress and adjust plans</p>
+        </div>
+
+        <div class="section">
+            <h3>🎯 2026 North Star Goals</h3>
+            <div class="metric-card">
+                <h4>Total Users</h4>
+                <p class="value">5,000</p>
+            </div>
+            <div class="metric-card">
+                <h4>Brand Partnerships</h4>
+                <p class="value">3</p>
+            </div>
+            <div class="metric-card">
+                <h4>Monthly Transacting Users</h4>
+                <p class="value">100</p>
+            </div>
+            <div class="metric-card">
+                <h4>Affiliate Revenue</h4>
+                <p class="value">$15K+</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>📈 Quarterly Milestones</h3>
+            <table>
+                <tr>
+                    <th>Quarter</th>
+                    <th>Phase</th>
+                    <th>Primary Goal</th>
+                    <th>Key Deliverables</th>
+                    <th>Success Metrics</th>
+                </tr>
+                <tr>
+                    <td><strong>Q1</strong><br>Jan-Mar</td>
+                    <td>Validation</td>
+                    <td>Validate product-market fit</td>
+                    <td>• App launch<br>• Customer journey mapping<br>• Hire social intern<br>• Dupe detector MVP</td>
+                    <td>• 750 downloads<br>• 60 sample requests<br>• 25 purchases<br>• 4.5+ rating</td>
+                </tr>
+                <tr>
+                    <td><strong>Q2</strong><br>Apr-Jun</td>
+                    <td>Optimization</td>
+                    <td>Scale in-person marketing</td>
+                    <td>• 3-4 campus events<br>• <strong>Ulta Beauty World (Apr 16)</strong><br>• Expand dupe detector<br>• Brand analytics dashboard</td>
+                    <td>• 1,500 downloads<br>• 60 MTU<br>• First brand partner<br>• 4 campus events</td>
+                </tr>
+                <tr>
+                    <td><strong>Q3</strong><br>Jul-Sep</td>
+                    <td>Growth + Fundraise</td>
+                    <td>Scale + RAISE PRESEED</td>
+                    <td>• Follow-up from Q2 event<br>• User reviews<br>• Active fundraising</td>
+                    <td>• 3,500 total users<br>• 2 brand partners<br>• 80 MTU<br>• $150K-$300K raised</td>
+                </tr>
+                <tr>
+                    <td><strong>Q4</strong><br>Oct-Dec</td>
+                    <td>Scale</td>
+                    <td>Prove revenue model</td>
+                    <td>• 3rd brand partnership<br>• Holiday marketing<br>• Deploy funding</td>
+                    <td>• 5,000 total users<br>• 3 brand partners<br>• 100+ MTU<br>• $15K+ revenue</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h3>🎪 In-Person Marketing Strategy</h3>
+            <table>
+                <tr>
+                    <th>Timing</th>
+                    <th>Event Type</th>
+                    <th>Strategy</th>
+                    <th>Expected Impact</th>
+                </tr>
+                <tr>
+                    <td>Q2 (Apr-Jun)</td>
+                    <td>Campus Events + Beauty Event</td>
+                    <td>• Partner with campus ambassador<br>• Booth at student centers<br>• Free shade matching<br>• 3-4 events at HBCUs<br>• <strong>Attend Ulta Beauty World (Apr 16)</strong></td>
+                    <td>150-200 downloads<br>30-40 sample requests<br>20+ brand contacts</td>
+                </tr>
+                <tr>
+                    <td>Q3 (Jul-Sep)</td>
+                    <td>Follow-up & Local Events</td>
+                    <td>• Follow up with Ulta Beauty World contacts<br>• Explore local beauty pop-ups<br>• Summer campus activations</td>
+                    <td>2-3 brand partnerships<br>Summer engagement<br>Community building</td>
+                </tr>
+                <tr>
+                    <td>Q3-Q4 (Aug-Nov)</td>
+                    <td>Campus Events (Fall)</td>
+                    <td>• Back-to-school activation<br>• Partner with student orgs<br>• Homecoming at HBCUs</td>
+                    <td>200-250 downloads<br>Student ambassadors<br>Viral content</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h3>👥 Hiring Plan</h3>
+            <table>
+                <tr>
+                    <th>Timeline</th>
+                    <th>Role</th>
+                    <th>Hours/Week</th>
+                    <th>Responsibilities</th>
+                </tr>
+                <tr>
+                    <td>JD Dec 2025<br>Start Jan 2026</td>
+                    <td>Social Media/Content Intern</td>
+                    <td>10-15</td>
+                    <td>3-5 posts/week, influencer outreach, community engagement</td>
+                </tr>
+                <tr>
+                    <td>Apr 2026</td>
+                    <td>QA/Community Intern</td>
+                    <td>10</td>
+                    <td>Test features, document bugs, user support</td>
+                </tr>
+                <tr>
+                    <td>Mar 2026</td>
+                    <td>Campus Ambassador</td>
+                    <td>5-10</td>
+                    <td>Organize campus events, recruit ambassadors, create UGC</td>
+                </tr>
+                <tr>
+                    <td>Q3 (if found)</td>
+                    <td>Data/Research Intern</td>
+                    <td>8-10</td>
+                    <td>Build dupe database, analyze data, research brands</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h3>💰 Budget Allocation</h3>
+            <table>
+                <tr>
+                    <th>Category</th>
+                    <th>Q1</th>
+                    <th>Q2</th>
+                    <th>Q3</th>
+                    <th>Q4</th>
+                    <th>Total</th>
+                </tr>
+                <tr>
+                    <td>Paid Marketing</td>
+                    <td>$900</td>
+                    <td>$1,200</td>
+                    <td>$3,000</td>
+                    <td>$3,000</td>
+                    <td>$8,100</td>
+                </tr>
+                <tr>
+                    <td>Sample Fulfillment</td>
+                    <td>$360</td>
+                    <td>$240</td>
+                    <td>$180</td>
+                    <td>$180</td>
+                    <td>$960</td>
+                </tr>
+                <tr>
+                    <td>Events</td>
+                    <td>$0</td>
+                    <td>$800</td>
+                    <td>$500</td>
+                    <td>$800</td>
+                    <td>$2,100</td>
+                </tr>
+                <tr>
+                    <td>Tools & Software</td>
+                    <td>$300</td>
+                    <td>$300</td>
+                    <td>$500</td>
+                    <td>$500</td>
+                    <td>$1,600</td>
+                </tr>
+                <tr>
+                    <td>Intern Stipends</td>
+                    <td>$0</td>
+                    <td>$0</td>
+                    <td>$2,000</td>
+                    <td>$2,000</td>
+                    <td>$4,000</td>
+                </tr>
+                <tr>
+                    <td><strong>Total</strong></td>
+                    <td><strong>$1,560</strong></td>
+                    <td><strong>$2,540</strong></td>
+                    <td><strong>$6,180</strong></td>
+                    <td><strong>$6,480</strong></td>
+                    <td><strong>$16,760</strong></td>
+                </tr>
+            </table>
+            <p style="font-size:12px;color:#666;"><em>Q3-Q4 assumes funding secured</em></p>
+        </div>
+
+        <div class="section">
+            <h3>🎯 Fundraising Strategy</h3>
+            <table>
+                <tr>
+                    <th>Quarter</th>
+                    <th>Activity</th>
+                    <th>Goal</th>
+                </tr>
+                <tr>
+                    <td>Q1</td>
+                    <td>Build the story</td>
+                    <td>Focus on product + traction. Document journey. Create investor template.</td>
+                </tr>
+                <tr>
+                    <td>Q2</td>
+                    <td>Warm network + Prepare</td>
+                    <td>Share updates. Build list of 30-50 angels. Create deck. Get feedback.</td>
+                </tr>
+                <tr>
+                    <td>Q3</td>
+                    <td>ACTIVE FUNDRAISING</td>
+                    <td>Raise $150K-$300K preseed. Need: 2,500+ users, 1-2 brand partners, $5K+ revenue.</td>
+                </tr>
+                <tr>
+                    <td>Q4</td>
+                    <td>Close + Deploy</td>
+                    <td>Finalize round. Deploy capital: hire FT engineer, scale marketing.</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div id="q1" class="content">
+        <h2>Q1 2026: Validation Phase (Jan-Mar)</h2>
+        
+        <div class="quarter-card">
+            <h3>🎯 Quarter Goal</h3>
+            <p><strong>Validate product-market fit with early adopters</strong></p>
+            <p><strong>Success Metrics:</strong> 750 downloads | 60 sample requests | 25 purchases | 4.5+ star rating</p>
+        </div>
+
+        <div class="section">
+            <h3>January: Launch + Customer Journey</h3>
+            
+            <div class="week-block">
+                <h4>Week 1 (Jan 1-5): 🚀 LAUNCH WEEK</h4>
+                <ul>
+                    <li><strong>Engineering:</strong> App Store submission | PostHog tracking | Monitor P0 bugs</li>
+                    <li><strong>Marketing:</strong> First social posts | Re-engage existing influencer</li>
+                    <li><strong>Product:</strong> Customer journey mapping workshop</li>
+                    <li><strong>Hiring:</strong> Submit social intern JD</li>
+                </ul>
+                <p style="margin:5px 0 0 0;font-size:13px;"><strong>Owners:</strong> Justin (eng), You (marketing), Garima (product)</p>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 2 (Jan 6-12): Stabilize + Journey Design</h4>
+                <ul>
+                    <li><strong>Engineering:</strong> Fix P0 bugs | Set up PostHog funnels</li>
+                    <li><strong>Marketing:</strong> 3 TikToks/Reels | Build influencer list | Review intern applications</li>
+                    <li><strong>Product:</strong> Design email sequences | Design push notification strategy</li>
+                </ul>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 3 (Jan 13-19): Journey Implementation</h4>
+                <ul>
+                    <li><strong>Engineering:</strong> Build email notification system | Analyze drop-offs</li>
+                    <li><strong>Marketing:</strong> 3 posts | First influencer outreach (5 people) | Select intern</li>
+                    <li><strong>Product:</strong> Write first 3 email sequences</li>
+                </ul>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 4 (Jan 20-26): Optimize + Onboard Intern</h4>
+                <ul>
+                    <li><strong>Engineering:</strong> Ship email sequences | Test push notifications</li>
+                    <li><strong>Marketing:</strong> 3 posts | ONBOARD SOCIAL INTERN</li>
+                    <li><strong>Product:</strong> Review month 1 metrics</li>
+                </ul>
+            </div>
+
+            <p><strong>January Target:</strong> 200 downloads | 15 sample requests | 6 purchases</p>
+        </div>
+
+        <div class="section">
+            <h3>February: Optimize + Dupe Research</h3>
+            
+            <div class="week-block">
+                <h4>Week 5 (Jan 27-Feb 2): Journey Optimization</h4>
+                <ul>
+                    <li><strong>Engineering:</strong> Improve sample request flow | Add A/B testing</li>
+                    <li><strong>Marketing:</strong> Intern creates 3 posts | Sign NEW influencer</li>
+                    <li><strong>Product:</strong> Add 2 more email sequences</li>
+                </ul>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 6 (Feb 3-9): Expand Notifications + Dupe Research</h4>
+                <ul>
+                    <li><strong>Engineering:</strong> Ship optimized notifications | Start dupe research</li>
+                    <li><strong>Data:</strong> Build dupe database (50 products)</li>
+                    <li><strong>Marketing:</strong> Intern creates 4 posts</li>
+                </ul>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 7 (Feb 10-16): Dupe Database Build</h4>
+                <ul>
+                    <li><strong>Data:</strong> Continue dupe database (75 products)</li>
+                    <li><strong>Engineering:</strong> Start building dupe detector UI</li>
+                    <li><strong>Marketing:</strong> Intern manages 5 posts | Sign second influencer | You recruit campus ambassador</li>
+                </ul>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 8 (Feb 17-23): Month Review + Campus Prep</h4>
+                <ul>
+                    <li><strong>All:</strong> Month 2 metrics review | Plan March priorities</li>
+                    <li><strong>Marketing:</strong> Finalize campus ambassador selection</li>
+                    <li><strong>Operations:</strong> Paid ads analysis</li>
+                </ul>
+            </div>
+
+            <p><strong>February Target:</strong> 300 downloads | 25 sample requests | 10 purchases</p>
+        </div>
+
+        <div class="section">
+            <h3>March: Launch Dupe Detector + Campus Events</h3>
+            
+            <div class="week-block">
+                <h4>Week 9 (Feb 24-Mar 2): Dupe Detector Build</h4>
+                <ul>
+                    <li><strong>Engineering:</strong> Build dupe detector UI | Integrate database</li>
+                    <li><strong>Marketing:</strong> Intern creates 5 posts | Start Q2 intern JDs</li>
+                </ul>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 10 (Mar 3-9): Ship Dupe Detector</h4>
+                <ul>
+                    <li><strong>Engineering:</strong> Launch dupe detector MVP</li>
+                    <li><strong>Marketing:</strong> PR angle for dupe feature | Onboard campus ambassador</li>
+                </ul>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 11 (Mar 10-16): Campus Event #1</h4>
+                <ul>
+                    <li><strong>Engineering:</strong> Add wishlist feature</li>
+                    <li><strong>Marketing:</strong> <strong>FIRST CAMPUS EVENT</strong> | Intern creates dupe content | PR outreach</li>
+                </ul>
+            </div>
+
+            <div class="week-block">
+                <h4>Week 12 (Mar 17-23): Q1 Retro</h4>
+                <ul>
+                    <li><strong>Hiring:</strong> Interview Q2 intern candidates</li>
+                    <li><strong>All:</strong> Q1 retrospective | Celebrate wins | Plan Q2</li>
+                </ul>
+            </div>
+
+            <p><strong>March Target:</strong> 250 downloads | 20 sample requests | 9 purchases</p>
+        </div>
+
+        <div class="note">
+            <strong>Q1 Engineering Time:</strong> Jan: 100% bug fixes | Feb: 60% optimization, 40% dupe prep | Mar: 70% dupe + wishlist, 30% maintenance
+        </div>
+    </div>
+
+    <div id="q2" class="content">
+        <h2>Q2 2026: Optimization Phase (Apr-Jun)</h2>
+        
+        <div class="quarter-card">
+            <h3>🎯 Quarter Goal</h3>
+            <p><strong>Improve conversion + scale in-person marketing</strong></p>
+            <p><strong>Success Metrics:</strong> 1,500 downloads | 30% conversion | 60 MTU | First brand partner | 4 campus events | Attend Ulta Beauty World</p>
+        </div>
+
+        <div class="section">
+            <h3>April: Ulta Beauty World + Campus Events</h3>
+            <ul>
+                <li><strong>ATTEND ULTA BEAUTY WORLD (April 16, Orlando FL)</strong></li>
+                <li>Network with indie brands and collect contacts</li>
+                <li>Onboard QA/Community intern</li>
+                <li>Expand dupe detector to 100 products</li>
+                <li>Start brand analytics dashboard design</li>
+                <li>Campus event #2</li>
+                <li>Target: 400 downloads, 40 MTU</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>May: Brand Tools + Partnerships</h3>
+            <ul>
+                <li>Complete dupe database (200 products)</li>
+                <li>Ship brand analytics dashboard MVP</li>
+                <li>Outreach to 10 micro indie brands</li>
+                <li>Campus events #3 & #4</li>
+                <li>Target: 500 downloads, 50 MTU</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>June: Close First Partnership</h3>
+            <ul>
+                <li><strong>SIGN FIRST BRAND PARTNER</strong></li>
+                <li>Add user reviews/ratings feature</li>
+                <li>Q2 retrospective</li>
+                <li>Draft investor deck v1</li>
+                <li>Target: 600 downloads, 60 MTU, 30% conversion rate</li>
+            </ul>
+        </div>
+
+        <div class="note">
+            <strong>Q2 Engineering Focus:</strong> 50% brand tools | 30% expanding dupe DB | 20% maintenance<br>
+            <strong>Ulta Beauty World Details:</strong> April 16, 2026 in Orlando, FL. Budget: $800 (ticket + travel). Goal: Network with 20+ indie brands, collect 10+ qualified leads for partnerships.
+        </div>
+    </div>
+
+    <div id="q3" class="content">
+        <h2>Q3 2026: Growth + Fundraising Phase (Jul-Sep)</h2>
+        
+        <div class="quarter-card">
+            <h3>🎯 Quarter Goal</h3>
+            <p><strong>Scale acquisition + secure partnerships + RAISE PRESEED</strong></p>
+            <p><strong>Success Metrics:</strong> 3,500 total users | 2 brand partners | 80 MTU | $150K-$300K raised | Follow-up on Q2 event contacts</p>
+        </div>
+
+        <div class="section">
+            <h3>July: Reviews + Follow-up Outreach</h3>
+            <ul>
+                <li>Ship user reviews/ratings feature</li>
+                <li>Follow up with contacts from Ulta Beauty World</li>
+                <li>Consider attending IBS Las Vegas (late June/early July) for additional networking</li>
+                <li>Scale paid ads to $500/month</li>
+                <li>Partner with 3 more influencers</li>
+                <li>Share investor deck with 5 friendly angels for feedback</li>
+                <li>Target: 600 downloads, 120 MTU</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>August: Active Fundraising + Summer Campaigns</h3>
+            <ul>
+                <li>Explore attendance at regional beauty events or local pop-ups</li>
+                <li>Close 2nd brand partnership</li>
+                <li>Active fundraising - pitch to 20-30 angels</li>
+                <li>Optimize notification timing based on data</li>
+                <li>Consider hiring Data/Research intern</li>
+                <li>Target: 700 downloads, 130 MTU</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>September: Close Fundraise</h3>
+            <ul>
+                <li><strong>CLOSE PRESEED ROUND ($150K-$300K)</strong></li>
+                <li>Q3 retrospective and celebration</li>
+                <li>Improve 90-day retention to 20%</li>
+                <li>Q3 retrospective</li>
+                <li>Plan Q4 with funding secured</li>
+                <li>Target: 700 downloads, 150 MTU</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="q4" class="content">
+        <h2>Q4 2026: Scale Phase (Oct-Dec)</h2>
+        
+        <div class="quarter-card">
+            <h3>🎯 Quarter Goal</h3>
+            <p><strong>Close fundraise + prove revenue model</strong></p>
+            <p><strong>Success Metrics:</strong> 5,000 total users | 3 brand partners | 100+ MTU | $15K+ revenue | Deploy funding</p>
+        </div>
+
+        <div class="section">
+            <h3>October: Partnership #3 + Deploy Capital</h3>
+            <ul>
+                <li>Sign 3rd brand partnership</li>
+                <li>Consider attending BeautyMatter NEXT Summit (Oct 4-5, LA) for investor/brand networking</li>
+                <li>Begin deploying raised capital</li>
+                <li>Plan hiring: Consider FT engineer or operations lead</li>
+                <li>Document brand partnership case studies</li>
+                <li>Back-to-school campus events</li>
+                <li>Target: 800 downloads, 160 MTU, $3K revenue</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>November: Holiday Marketing Push</h3>
+            <ul>
+                <li>Launch holiday marketing campaigns</li>
+                <li>Black Friday / Cyber Monday promotions with brand partners</li>
+                <li>Scale paid marketing to $1K+/month</li>
+                <li>Optimize all conversion funnels</li>
+                <li>Target: 1,000 downloads, 180 MTU, $4K revenue</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>December: Year-End + 2027 Planning</h3>
+            <ul>
+                <li>Hit $15K+ annual revenue milestone</li>
+                <li>Annual retrospective - celebrate wins!</li>
+                <li>Plan 2027 roadmap with funding</li>
+                <li>Begin recruiting for FT hires (if funding allows)</li>
+                <li>Holiday break for team</li>
+                <li>Target: 1,200 downloads, 200 MTU, $8K+ revenue</li>
+            </ul>
+        </div>
+
+        <div class="note">
+            <strong>Key Focus:</strong> Prove revenue model | Scale with funding | Prepare for growth phase in 2027
+        </div>
+    </div>
+
+    <div id="tasks" class="content">
+        <h2>✅ Weekly Tasks</h2>
+        
+        <div class="instructions">
+            <h4>How to Use This Tracker</h4>
+            <p><strong>Wednesday Meeting:</strong> Review tasks, update status, assign new micro-tasks<br>
+            <strong>Recommendation:</strong> For ACTIVE daily tracking, use a simple Google Sheet with columns: Week #, Task, Owner, Priority, Status, Notes. Keep this HTML for big-picture planning!</p>
+        </div>
+
+        <div class="section">
+            <h3>Current Week Template</h3>
+            <table>
+                <tr>
+                    <th style="width: 5%">#</th>
+                    <th style="width: 15%">Area</th>
+                    <th style="width: 35%">Task</th>
+                    <th style="width: 12%">Owner</th>
+                    <th style="width: 10%">Priority</th>
+                    <th style="width: 8%">Hours</th>
+                    <th style="width: 15%">Status</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Engineering</td>
+                    <td>[Task description - what needs to be done]</td>
+                    <td>[Team member]</td>
+                    <td>P0/P1/P2/P3</td>
+                    <td>[Est hours]</td>
+                    <td>Not Started</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Marketing</td>
+                    <td>[Task description - be specific]</td>
+                    <td>[Team member]</td>
+                    <td>P0/P1/P2/P3</td>
+                    <td>[Est hours]</td>
+                    <td>In Progress</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Product</td>
+                    <td>[Task description]</td>
+                    <td>[Team member]</td>
+                    <td>P0/P1/P2/P3</td>
+                    <td>[Est hours]</td>
+                    <td>Done</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h3>Priority Definitions</h3>
+            <ul>
+                <li><strong>P0 - Drop Everything:</strong> App crashes, core flow broken, data loss, security issues. Fix immediately.</li>
+                <li><strong>P1 - Fix This Week:</strong> Features that give wrong results, significant UX friction. ROI Score 70+. Fix within 1-2 weeks.</li>
+                <li><strong>P2 - Fix Next Sprint:</strong> Minor UX annoyances, edge cases affecting <10% users. ROI Score 40-69. Fix within 1 month.</li>
+                <li><strong>P3 - Backlog:</strong> Nice-to-haves, visual polish. ROI Score <40. Fix when slow.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>ICE + ROI Scoring Framework</h3>
+            <p>For every bug or feature request:</p>
+            <ul>
+                <li><strong>Impact</strong> (1-10): How much does this affect UX or revenue?</li>
+                <li><strong>Confidence</strong> (1-10): How sure are we this matters?</li>
+                <li><strong>Ease</strong> (1-10): How easy is it to build?</li>
+                <li><strong>ROI Score = (Impact × Confidence) / Ease</strong></li>
+            </ul>
+            <p><strong>Example:</strong> Bug causing 20% drop-off at checkout → Impact: 10, Confidence: 9, Ease: 7 → ROI: (10×9)/7 = 12.9 → P1</p>
+        </div>
+
+        <div class="section">
+            <h3>Wednesday Meeting Agenda Template</h3>
+            <div style="background: #f8f9ff; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                <p><strong>Date:</strong> [MM/DD/YYYY]</p>
+                <p><strong>Attendees:</strong> [Names]</p>
+                <p><strong>Last Week Wins:</strong></p>
+                <ul>
+                    <li>[What shipped? What got done?]</li>
+                    <li>[What metrics moved?]</li>
+                </ul>
+                <p><strong>Key Metrics Update:</strong></p>
+                <ul>
+                    <li>Downloads this week: [#]</li>
+                    <li>Sample requests: [#]</li>
+                    <li>Purchases: [#]</li>
+                    <li>Top drop-off point: [Screen/step from PostHog]</li>
+                </ul>
+                <p><strong>This Week Top 3 Priorities:</strong></p>
+                <ol>
+                    <li>[Priority 1 with owner assigned]</li>
+                    <li>[Priority 2 with owner assigned]</li>
+                    <li>[Priority 3 with owner assigned]</li>
+                </ol>
+                <p><strong>Blockers/Concerns:</strong></p>
+                <ul>
+                    <li>[What's blocking progress? What help is needed?]</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Decision Framework for New Features</h3>
+            <p>When someone suggests a new feature, ask:</p>
+            <ol>
+                <li><strong>Does this directly increase purchases or reduce drop-off?</strong> (If no → backlog)</li>
+                <li><strong>Can we build an MVP in <40 engineering hours?</strong> (If no → break it down or cut)</li>
+                <li><strong>Does this support our brand partnership pitch?</strong> (If yes → bonus points)</li>
+            </ol>
+            <p>If a feature doesn't score 2/3 "yes" answers, defer it to 2027.</p>
+        </div>
+
+        <div class="section">
+            <h3>Your "NO" List for 2026</h3>
+            <ul>
+                <li>❌ AI makeup artist consultations (too complex, too expensive)</li>
+                <li>❌ Custom filters / AR try-on (not your differentiator, very expensive)</li>
+                <li>❌ Social features / community (adds complexity, requires moderation)</li>
+                <li>❌ Any feature that requires >40 engineering hours</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="metrics" class="content">
+        <h2>📊 Metrics Dashboard</h2>
+        <button class="export-btn" onclick="exportData()">📥 Export to CSV</button>
+        <p style="color: #667eea;">💡 Click any "Actual" cell to edit. Changes sync across your team in ~10 seconds!</p>
+        
+        <div id="metricsContainer">Loading metrics...</div>
+    </div>
+
+    <script>
+        // Initialize Supabase client (ONLY ONCE)
+        const sbClient = window.supabase.createClient(
+            'https://yohzdpshfxazvfcwobxb.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlvaHpkcHNoZnhhenZmY3dvYnhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMjY5NTgsImV4cCI6MjA4MjYwMjk1OH0.th16vrzPpghofqy9k54wEX1pOHM7s-u2n4Ih_-jiQLg'
+        );
+
+        let metricsCache = {};
+
+        // Tab switching function
+        function switchTab(tabName) {
+            document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'metrics') {
+                renderMetrics();
+            }
+        }
+
+        // Initialize metrics in database
+        async function initMetrics() {
+            const setup = [
+                // Q1
+                {q: 'Q1', m: 'Jan', metrics: {Downloads: '200', 'Sample Requests': '15', Purchases: '6', MTU: '5'}},
+                {q: 'Q1', m: 'Feb', metrics: {Downloads: '300', 'Sample Requests': '25', Purchases: '10', MTU: '10'}},
+                {q: 'Q1', m: 'Mar', metrics: {Downloads: '250', 'Sample Requests': '20', Purchases: '9', MTU: '15'}},
+                // Q2
+                {q: 'Q2', m: 'Apr', metrics: {Downloads: '400', 'Sample Requests': '30', Purchases: '12', MTU: '40'}},
+                {q: 'Q2', m: 'May', metrics: {Downloads: '500', 'Sample Requests': '35', Purchases: '15', MTU: '50'}},
+                {q: 'Q2', m: 'Jun', metrics: {Downloads: '600', 'Sample Requests': '40', Purchases: '18', MTU: '60'}},
+                // Q3
+                {q: 'Q3', m: 'Jul', metrics: {Downloads: '600', 'Sample Requests': '45', Purchases: '20', MTU: '120'}},
+                {q: 'Q3', m: 'Aug', metrics: {Downloads: '700', 'Sample Requests': '50', Purchases: '25', MTU: '130'}},
+                {q: 'Q3', m: 'Sep', metrics: {Downloads: '700', 'Sample Requests': '50', Purchases: '25', MTU: '150'}},
+                // Q4
+                {q: 'Q4', m: 'Oct', metrics: {Downloads: '800', 'Sample Requests': '50', Purchases: '30', MTU: '160'}},
+                {q: 'Q4', m: 'Nov', metrics: {Downloads: '1000', 'Sample Requests': '60', Purchases: '40', MTU: '180'}},
+                {q: 'Q4', m: 'Dec', metrics: {Downloads: '1200', 'Sample Requests': '70', Purchases: '50', MTU: '200'}}
+            ];
+
+            for (const item of setup) {
+                for (const [name, target] of Object.entries(item.metrics)) {
+                    const {data: existing} = await sbClient.from('metrics')
+                        .select().eq('quarter', item.q).eq('month', item.m).eq('metric_name', name).single();
+                    
+                    if (!existing) {
+                        await sbClient.from('metrics').insert({
+                            quarter: item.q, month: item.m, metric_name: name, target, actual: ''
+                        });
+                    }
+                }
+            }
+        }
+
+        // Load metrics from database
+        async function loadMetrics() {
+            const {data} = await sbClient.from('metrics').select('*');
+            if (data) {
+                metricsCache = {};
+                data.forEach(row => {
+                    const key = `${row.quarter}-${row.month}-${row.metric_name}`;
+                    metricsCache[key] = row;
+                });
+            }
+        }
+
+        // Save metric to database
+        async function saveMetric(quarter, month, name, value) {
+            await sbClient.from('metrics').update({actual: value})
+                .eq('quarter', quarter).eq('month', month).eq('metric_name', name);
+            await loadMetrics();
+            renderMetrics();
+        }
+
+        // Make cell editable
+        function makeEditable(el, q, m, name) {
+            const val = el.textContent.trim();
+            el.innerHTML = `<input type="text" value="${val}" style="width:60px;border:1px solid #667eea;padding:4px;border-radius:4px;"/>`;
+            const input = el.querySelector('input');
+            input.focus();
+            input.select();
+
+            const save = () => {
+                const newVal = input.value.trim();
+                el.textContent = newVal || '-';
+                saveMetric(q, m, name, newVal);
+            };
+
+            input.onblur = save;
+            input.onkeypress = (e) => { if (e.key === 'Enter') save(); };
+        }
+
+        // Render metrics dashboard
+        function renderMetrics() {
+            const quarters = [
+                {id: 'Q1', name: 'Q1 2026 (Jan-Mar)', months: ['Jan','Feb','Mar']},
+                {id: 'Q2', name: 'Q2 2026 (Apr-Jun)', months: ['Apr','May','Jun']},
+                {id: 'Q3', name: 'Q3 2026 (Jul-Sep)', months: ['Jul','Aug','Sep']},
+                {id: 'Q4', name: 'Q4 2026 (Oct-Dec)', months: ['Oct','Nov','Dec']}
+            ];
+            const metricNames = ['Downloads', 'Sample Requests', 'Purchases', 'MTU'];
+
+            // Default targets if not in database yet
+            const defaultTargets = {
+                'Q1-Jan-Downloads': '200', 'Q1-Jan-Sample Requests': '15', 'Q1-Jan-Purchases': '6', 'Q1-Jan-MTU': '5',
+                'Q1-Feb-Downloads': '300', 'Q1-Feb-Sample Requests': '25', 'Q1-Feb-Purchases': '10', 'Q1-Feb-MTU': '10',
+                'Q1-Mar-Downloads': '250', 'Q1-Mar-Sample Requests': '20', 'Q1-Mar-Purchases': '9', 'Q1-Mar-MTU': '15',
+                'Q2-Apr-Downloads': '400', 'Q2-Apr-Sample Requests': '30', 'Q2-Apr-Purchases': '12', 'Q2-Apr-MTU': '40',
+                'Q2-May-Downloads': '500', 'Q2-May-Sample Requests': '35', 'Q2-May-Purchases': '15', 'Q2-May-MTU': '50',
+                'Q2-Jun-Downloads': '600', 'Q2-Jun-Sample Requests': '40', 'Q2-Jun-Purchases': '18', 'Q2-Jun-MTU': '60',
+                'Q3-Jul-Downloads': '600', 'Q3-Jul-Sample Requests': '45', 'Q3-Jul-Purchases': '20', 'Q3-Jul-MTU': '120',
+                'Q3-Aug-Downloads': '700', 'Q3-Aug-Sample Requests': '50', 'Q3-Aug-Purchases': '25', 'Q3-Aug-MTU': '130',
+                'Q3-Sep-Downloads': '700', 'Q3-Sep-Sample Requests': '50', 'Q3-Sep-Purchases': '25', 'Q3-Sep-MTU': '150',
+                'Q4-Oct-Downloads': '800', 'Q4-Oct-Sample Requests': '50', 'Q4-Oct-Purchases': '30', 'Q4-Oct-MTU': '160',
+                'Q4-Nov-Downloads': '1000', 'Q4-Nov-Sample Requests': '60', 'Q4-Nov-Purchases': '40', 'Q4-Nov-MTU': '180',
+                'Q4-Dec-Downloads': '1200', 'Q4-Dec-Sample Requests': '70', 'Q4-Dec-Purchases': '50', 'Q4-Dec-MTU': '200'
+            };
+
+            let html = '';
+            for (const qtr of quarters) {
+                html += `<h3>${qtr.name}</h3><table><tr><th>Metric</th>`;
+                qtr.months.forEach(m => {
+                    html += `<th>${m} Target</th><th>${m} Actual</th>`;
+                });
+                html += '</tr>';
+
+                for (const metric of metricNames) {
+                    html += `<tr><td><strong>${metric}</strong></td>`;
+                    for (const month of qtr.months) {
+                        const key = `${qtr.id}-${month}-${metric}`;
+                        const data = metricsCache[key] || {};
+                        const target = data.target || defaultTargets[key] || '-';
+                        const actual = data.actual || '-';
+                        html += `<td>${target}</td><td class="editable" onclick="makeEditable(this,'${qtr.id}','${month}','${metric}')">${actual}</td>`;
+                    }
+                    html += '</tr>';
+                }
+                html += '</table>';
+            }
+
+            document.getElementById('metricsContainer').innerHTML = html;
+        }
+
+        // Export to CSV
+        function exportData() {
+            let csv = 'Quarter,Month,Metric,Target,Actual\n';
+            for (const [key, data] of Object.entries(metricsCache)) {
+                csv += `${data.quarter},${data.month},${data.metric_name},${data.target},${data.actual || ''}\n`;
+            }
+            const blob = new Blob([csv], {type: 'text/csv'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '2026-metrics.csv';
+            a.click();
+        }
+
+        // Poll for updates every 10 seconds
+        setInterval(async () => {
+            await loadMetrics();
+            if (document.getElementById('metrics').classList.contains('active')) {
+                renderMetrics();
+            }
+        }, 10000);
+
+        // Initialize on page load
+        (async () => {
+            await initMetrics();
+            await loadMetrics();
+        })();
+    </script>
+</body>
+</html>
